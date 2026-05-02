@@ -83,6 +83,15 @@ public class Company {
     @Column(name = "allowed_locations")
     private String allowedLocations;
 
+    @Column(name = "password_hash")
+    private String passwordHash;
+
+    // Used only for form binding during setup — never persisted to DB
+    @Transient
+    @NotBlank(message = "Password is required")
+    @Size(min = 6, message = "Password must be at least 6 characters")
+    private String password;
+
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
@@ -122,4 +131,8 @@ public class Company {
     public void setAllowedDepartments(String allowedDepartments) { this.allowedDepartments = allowedDepartments; }
     public String getAllowedLocations() { return allowedLocations; }
     public void setAllowedLocations(String allowedLocations) { this.allowedLocations = allowedLocations; }
+    public String getPasswordHash() { return passwordHash; }
+    public void setPasswordHash(String passwordHash) { this.passwordHash = passwordHash; }
+    public String getPassword() { return password; }
+    public void setPassword(String password) { this.password = password; }
 }

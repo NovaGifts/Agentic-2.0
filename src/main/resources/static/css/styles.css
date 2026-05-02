@@ -55,6 +55,7 @@ a { text-decoration: none; color: inherit; }
 .btn-outline-white { background: transparent; color: #fff; border-color: rgba(255,255,255,0.6); }
 .btn-outline-white:hover { background: rgba(255,255,255,0.12); }
 .btn-lg        { padding: 14px 28px; font-size: 15px; }
+.btn-sm        { padding: 6px 12px;  font-size: 12px; }
 .btn-full      { width: 100%; }
 
 /* ── Navbar ── */
@@ -617,6 +618,51 @@ body.admin-page { background: var(--bg-alt); }
     transition: border-color 0.15s;
 }
 .status-select:focus { border-color: var(--brand); }
+
+/* ── AI Recommendation ── */
+.policy-banner {
+    padding: 14px 20px; border-radius: var(--radius);
+    font-size: 14px; font-weight: 600;
+    display: flex; align-items: center; gap: 12px;
+    margin-bottom: 24px;
+}
+.banner-compliant     { background: #DCFCE7; color: #166534; border: 1px solid #BBF7D0; }
+.banner-non-compliant { background: #FEF2F2; color: #991B1B; border: 1px solid #FECACA; }
+.approval-tag {
+    margin-left: auto; font-size: 11px; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.06em;
+    background: #FEF9C3; color: #854D0E;
+    padding: 4px 10px; border-radius: 100px;
+}
+
+.gift-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px; padding: 4px 28px 28px;
+}
+.gift-card {
+    border: 1.5px solid var(--border); border-radius: 12px;
+    padding: 18px; transition: border-color 0.15s, box-shadow 0.15s;
+}
+.gift-card:hover { border-color: var(--brand); box-shadow: 0 4px 16px rgba(91,79,232,0.1); }
+.gift-category { font-size: 11px; font-weight: 700; text-transform: uppercase;
+                 letter-spacing: 0.06em; color: var(--brand); margin-bottom: 6px; }
+.gift-name     { font-size: 15px; font-weight: 700; margin-bottom: 6px; }
+.gift-price    { font-size: 20px; font-weight: 800; color: var(--text);
+                 letter-spacing: -0.02em; margin-bottom: 6px; }
+.gift-tags     { font-size: 12px; color: var(--muted); font-style: italic; }
+
+.message-box {
+    margin: 0 28px 28px; padding: 20px; background: var(--bg-alt);
+    border: 1px solid var(--border); border-radius: var(--radius);
+    font-size: 15px; line-height: 1.7; color: var(--text);
+    font-style: italic;
+}
+
+.rec-meta-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 0;
+}
+.meta-body { padding: 4px 28px 24px; font-size: 14px; color: var(--muted); line-height: 1.65; }
 
 /* ── Responsive ── */
 @media (max-width: 640px) {
