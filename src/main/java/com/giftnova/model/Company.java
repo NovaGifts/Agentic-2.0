@@ -5,6 +5,11 @@ import jakarta.validation.constraints.*;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
+/**
+ * Represents a customer company that uses GiftNova.
+ * Stores company profile, admin contact, and global gifting budget settings.
+ * Maps to the "companies" table in PostgreSQL.
+ */
 @Entity
 @Table(name = "companies")
 public class Company {
@@ -21,10 +26,12 @@ public class Company {
     @Column(nullable = false)
     private String website;
 
+    // Industry category (e.g. Technology, Finance)
     @NotBlank(message = "Industry is required")
     @Column(nullable = false)
     private String industry;
 
+    // Approximate headcount — used for budget planning
     @Min(value = 1, message = "Employee count must be at least 1")
     @Column(name = "employee_count", nullable = false)
     private int employeeCount;
@@ -33,6 +40,7 @@ public class Company {
     @Column(nullable = false)
     private String country;
 
+    // ISO 4217 currency code (e.g. USD, INR)
     @NotBlank(message = "Currency is required")
     @Column(nullable = false, length = 3)
     private String currency;
@@ -46,23 +54,39 @@ public class Company {
     @Column(name = "admin_email", nullable = false)
     private String adminEmail;
 
+    // IANA timezone ID (e.g. America/New_York) — used to schedule gift reminders
     @NotBlank(message = "Timezone is required")
     @Column(nullable = false)
     private String timezone;
 
+    // Total amount the company can spend on gifts in a calendar month
     @NotNull(message = "Monthly budget is required")
     @DecimalMin(value = "0.01", message = "Budget must be greater than 0")
     @Column(name = "monthly_budget", nullable = false, precision = 12, scale = 2)
     private BigDecimal monthlyBudget;
 
+    // Gifts costing more than this need manager approval before being sent
     @NotNull(message = "Approval threshold is required")
     @DecimalMin(value = "0.01", message = "Threshold must be greater than 0")
     @Column(name = "approval_threshold", nullable = false, precision = 10, scale = 2)
     private BigDecimal approvalThreshold;
 
+    // Comma-separated list of gift categories that are blocked (e.g. "Alcohol, Tobacco")
+    @Column(name = "restricted_categories")
+    private String restrictedCategories;
+
+    // Comma-separated list of departments eligible for gifting; null = all departments
+    @Column(name = "allowed_departments")
+    private String allowedDepartments;
+
+    // Comma-separated list of office locations eligible for gifting; null = all locations
+    @Column(name = "allowed_locations")
+    private String allowedLocations;
+
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
+    // Automatically set createdAt before the first DB insert
     @PrePersist
     void prePersist() {
         this.createdAt = LocalDateTime.now();
@@ -92,4 +116,10 @@ public class Company {
     public BigDecimal getApprovalThreshold() { return approvalThreshold; }
     public void setApprovalThreshold(BigDecimal approvalThreshold) { this.approvalThreshold = approvalThreshold; }
     public LocalDateTime getCreatedAt() { return createdAt; }
+    public String getRestrictedCategories() { return restrictedCategories; }
+    public void setRestrictedCategories(String restrictedCategories) { this.restrictedCategories = restrictedCategories; }
+    public String getAllowedDepartments() { return allowedDepartments; }
+    public void setAllowedDepartments(String allowedDepartments) { this.allowedDepartments = allowedDepartments; }
+    public String getAllowedLocations() { return allowedLocations; }
+    public void setAllowedLocations(String allowedLocations) { this.allowedLocations = allowedLocations; }
 }

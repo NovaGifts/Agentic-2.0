@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>GiftNova — Policy Builder</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}"/>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+</head>
+<body class="admin-page">
+
+<!-- ADMIN NAV -->
+<nav class="navbar">
+    <div class="container nav-inner">
+        <a href="/" class="logo">Gift<span>Nova</span></a>
+        <div class="nav-links">
+            <span class="admin-company" th:text="${company.name}"></span>
+            <a th:href="@{/admin/{id}/policies(id=${company.id})}" class="admin-tab active">Policy Rules</a>
+            <a th:href="@{/admin/{id}/audit(id=${company.id})}"    class="admin-tab">Audit Log</a>
+            <a href="/" class="btn btn-outline">← Home</a>
+        </div>
+    </div>
+</nav>
+
+<div class="admin-layout container">
+
+    <!-- PAGE HEADER -->
+    <div class="admin-header">
+        <div>
+            <div class="section-label">Phase 2</div>
+            <h1>Policy Builder</h1>
+            <p class="admin-sub">Define what GiftNova does automatically — by event, budget, and approval rule.</p>
+        </div>
+    </div>
+
+    <!-- SUCCESS FLASH -->
+    <div class="alert-success" th:if="${successMessage}" th:text="${successMessage}"></div>
+
+    <form th:action="@{/admin/{id}/policies(id=${company.id})}"
+          th:object="${policyForm}" method="post">
+
+        <!-- EVENT POLICY TABLE -->
+        <div class="admin-card">
+            <div class="admin-card-header">
+                <h2>Gift Event Rules</h2>
+                <p>Set the budget and approval behaviour for each event type.</p>
+            </div>
+
+            <div class="table-wrap">
+                <table class="policy-table">
+                    <thead>
+                        <tr>
+                            <th>Event Type</th>
+                            <th>Budget ($)</th>
+                            <th>Approval Required</th>
+                            <th>Approval Threshold ($)</th>
+                            <th>Auto-send</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="policy, i : *{policies}">
+                            <!-- Hidden fields so controller knows which policy to update -->
+                            <input type="hidden" th:field="*{policies[__${i.index}__].id}"/>
+                            <input type="hidden" th:field="*{policies[__${i.index}__].eventType}"/>
+
+                            <td class="event-label"
+                                th:text="${policyForm.policies[i.index].eventType.label}"></td>
+
+                            <td>
+                                <input type="number" class="table-input"
+                                       th:field="*{policies[__${i.index}__].budgetLimit}"
+                                       min="1" step="1"/>
+                            </td>
+
+                            <td class="center">
+                                <input type="checkbox" class="toggle"
+                                       th:field="*{policies[__${i.index}__].approvalRequired}"/>
+                            </td>
+
+                            <td>
+                                <input type="number" class="table-input"
+                                       th:field="*{policies[__${i.index}__].approvalThreshold}"
+                                       min="0" step="1"
+                                       placeholder="Always"/>
+                                <span class="table-hint">blank = always</span>
+                            </td>
+
+                            <td class="center">
+                                <input type="checkbox" class="toggle"
+                                       th:field="*{policies[__${i.index}__].autoSend}"/>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- COMPANY-LEVEL SETTINGS -->
+        <div class="admin-card">
+            <div class="admin-card-header">
+                <h2>Global Settings</h2>
+                <p>Rules that apply across all event types.</p>
+            </div>
+
+            <div class="global-grid">
+                <div class="form-group">
+                    <label>Restricted Gift Categories</label>
+                    <input type="text" th:field="*{restrictedCategories}"
+                           placeholder="e.g. Alcohol, Tobacco, Gambling"/>
+                    <p class="field-hint">Comma-separated. Gifts in these categories will be blocked.</p>
+                </div>
+
+                <div class="form-group">
+                    <label>Allowed Departments</label>
+                    <input type="text" th:field="*{allowedDepartments}"
+                           placeholder="e.g. Engineering, Sales, HR"/>
+                    <p class="field-hint">Leave blank to allow all departments.</p>
+                </div>
+
+                <div class="form-group">
+                    <label>Allowed Locations</label>
+                    <input type="text" th:field="*{allowedLocations}"
+                           placeholder="e.g. New York, Bangalore, London"/>
+                    <p class="field-hint">Leave blank to allow all locations.</p>
+                </div>
+
+                <div class="form-group">
+                    <label>Max Monthly Budget</label>
+                    <div class="input-prefix">
+                        <span class="prefix">$</span>
+                        <input type="text"
+                               th:value="${company.monthlyBudget}"
+                               disabled class="disabled-input"/>
+                    </div>
+                    <p class="field-hint">Set during company setup.
+                        <a th:href="@{/setup}">Update →</a></p>
+                </div>
+
+                <div class="form-group">
+                    <label>Global Approval Threshold</label>
+                    <div class="input-prefix">
+                        <span class="prefix">$</span>
+                        <input type="text"
+                               th:value="${company.approvalThreshold}"
+                               disabled class="disabled-input"/>
+                    </div>
+                    <p class="field-hint">Set during company setup.
+                        <a th:href="@{/setup}">Update →</a></p>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary btn-lg">Save Policies</button>
+            <a th:href="@{/admin/{id}/audit(id=${company.id})}" class="btn btn-outline btn-lg">
+                View Audit Log →
+            </a>
+        </div>
+
+    </form>
+</div>
+
+</body>
+</html>
