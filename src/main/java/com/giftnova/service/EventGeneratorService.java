@@ -82,7 +82,18 @@ public class EventGeneratorService {
         event.setEventType(type);
         event.setEventDate(date);
         event.setSuggestedBudget(getBudget(companyId, type));
+        event.setStatus(initialStatus(type));
         return event;
+    }
+
+    // Sets the initial status based on event type to match the policy workflow
+    private String initialStatus(EventType type) {
+        return switch (type) {
+            case BIRTHDAY             -> "NEEDS_REVIEW";
+            case WORK_ANNIVERSARY     -> "APPROVAL_NEEDED";
+            case ONBOARDING           -> "DRAFT_READY";
+            case MANAGER_APPRECIATION -> "APPROVAL_NEEDED";
+        };
     }
 
     // Looks up the budget from GiftPolicy; falls back to $0 if no policy found

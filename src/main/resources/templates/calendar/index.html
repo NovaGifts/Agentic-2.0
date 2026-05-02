@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>GiftNova — Lifecycle Calendar</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}"/>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+</head>
+<body class="admin-page">
+
+<nav class="navbar">
+    <div class="container nav-inner">
+        <a href="/" class="logo">Gift<span>Nova</span></a>
+        <div class="nav-links">
+            <span class="admin-company" th:text="${company.name}"></span>
+            <a th:href="@{/admin/{id}/policies(id=${company.id})}"      class="admin-tab">Policy Rules</a>
+            <a th:href="@{/companies/{id}/employees(id=${company.id})}" class="admin-tab">Employees</a>
+            <a th:href="@{/companies/{id}/calendar(id=${company.id})}"  class="admin-tab active">Calendar</a>
+            <a th:href="@{/admin/{id}/audit(id=${company.id})}"         class="admin-tab">Audit Log</a>
+        </div>
+    </div>
+</nav>
+
+<div class="admin-layout container">
+
+    <div class="admin-header">
+        <div>
+            <div class="section-label">Phase 4</div>
+            <h1>Lifecycle Calendar</h1>
+            <p class="admin-sub">Every recurring gifting moment, in one place. GiftNova runs the workflow — you just approve.</p>
+        </div>
+        <!-- Total event count badge -->
+        <div class="cal-summary">
+            <span class="count-badge" style="font-size:14px;padding:6px 16px;"
+                  th:text="${totalEvents} + ' upcoming events'"></span>
+        </div>
+    </div>
+
+    <!-- Empty state -->
+    <div class="admin-card" th:if="${eventsByMonth.isEmpty()}">
+        <div class="empty-state">
+            <div class="empty-icon">📅</div>
+            <p>No events yet.</p>
+            <p style="margin-top:8px;">
+                <a th:href="@{/companies/{id}/employees(id=${company.id})}">Upload employees</a>
+                to generate your lifecycle calendar.
+            </p>
+        </div>
+    </div>
+
+    <!-- One section per month -->
+    <div th:each="entry : ${eventsByMonth}" class="cal-month-block">
+
+        <!-- Month header (e.g. "May 2026") -->
+        <div class="cal-month-header" th:text="${entry.key}"></div>
+
+        <div class="admin-card">
+            <div class="table-wrap">
+                <table class="policy-table cal-table">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Employee</th>
+                            <th>Event</th>
+                            <th>Budget</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="ev : ${entry.value}">
+
+                            <!-- Date: "May 18" -->
+                            <td class="cal-date"
+                                th:text="${#temporals.format(ev.eventDate, 'MMM d')}"></td>
+
+                            <!-- Employee name with avatar initial -->
+                            <td>
+                                <div class="cal-employee">
+                                    <div class="cal-avatar"
+                                         th:text="${#strings.substring(ev.employeeName,0,1).toUpperCase()}"></div>
+                                    <span th:text="${ev.employeeName}"></span>
+                                </div>
+                            </td>
+
+                            <!-- Event type badge -->
+                            <td><span class="event-badge" th:text="${ev.eventType.label}"></span></td>
+
+                            <!-- Suggested budget -->
+                            <td class="cal-budget"
+                                th:text="'$' + ${ev.suggestedBudget}"></td>
+
+                            <!-- Status badge — colour changes per status -->
+                            <td>
+                                <span class="cal-status"
+                                      th:classappend="'status-' + ${ev.status.toLowerCase().replace('_','-')}"
+                                      th:text="${ev.status.replace('_',' ')}"></span>
+                            </td>
+
+                            <!-- Inline status update form -->
+                            <td>
+                                <form th:action="@{/companies/{cid}/calendar/events/{eid}/status
+                                      (cid=${company.id},eid=${ev.id})}"
+                                      method="post" class="status-form">
+                                    <select name="status"
+                                            onchange="this.form.submit()"
+                                            class="status-select">
+                                        <option value="NEEDS_REVIEW"
+                                                th:selected="${ev.status == 'NEEDS_REVIEW'}">Needs Review</option>
+                                        <option value="DRAFT_READY"
+                                                th:selected="${ev.status == 'DRAFT_READY'}">Draft Ready</option>
+                                        <option value="APPROVAL_NEEDED"
+                                                th:selected="${ev.status == 'APPROVAL_NEEDED'}">Approval Needed</option>
+                                        <option value="APPROVED"
+                                                th:selected="${ev.status == 'APPROVED'}">Approved</option>
+                                        <option value="SENT"
+                                                th:selected="${ev.status == 'SENT'}">Sent</option>
+                                    </select>
+                                </form>
+                            </td>
+
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+</div>
+</body>
+</html>
