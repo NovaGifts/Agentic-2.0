@@ -575,6 +575,49 @@ body.admin-page { background: var(--bg-alt); }
                    letter-spacing: 0.06em; background: #FEF9C3; color: #854D0E;
                    padding: 3px 8px; border-radius: 100px; }
 
+/* ── Lifecycle Calendar ── */
+.cal-month-block  { margin-bottom: 32px; }
+.cal-month-header {
+    font-size: 13px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.08em; color: var(--muted);
+    margin-bottom: 10px; padding-left: 4px;
+}
+.cal-table td  { vertical-align: middle; }
+.cal-date      { font-weight: 700; font-size: 14px; white-space: nowrap; min-width: 60px; }
+.cal-budget    { font-weight: 700; color: var(--brand); }
+.cal-summary   { display: flex; align-items: center; }
+
+.cal-employee  { display: flex; align-items: center; gap: 10px; }
+.cal-avatar    {
+    width: 32px; height: 32px; border-radius: 50%;
+    background: var(--brand-light); color: var(--brand);
+    font-size: 13px; font-weight: 800;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+}
+
+/* Status badge colours */
+.cal-status {
+    display: inline-block; font-size: 11px; font-weight: 600;
+    text-transform: capitalize; padding: 4px 10px;
+    border-radius: 100px; white-space: nowrap;
+}
+.cal-status.status-needs-review    { background: #FEF9C3; color: #854D0E; }
+.cal-status.status-approval-needed { background: #FEE2E2; color: #991B1B; }
+.cal-status.status-draft-ready     { background: #DBEAFE; color: #1E40AF; }
+.cal-status.status-approved        { background: #DCFCE7; color: #166534; }
+.cal-status.status-sent            { background: #F3F4F6; color: #6B7280; }
+
+/* Status update dropdown */
+.status-form   { margin: 0; }
+.status-select {
+    padding: 6px 10px; border: 1.5px solid var(--border);
+    border-radius: 8px; font-size: 13px; font-family: inherit;
+    background: var(--bg); cursor: pointer; outline: none;
+    transition: border-color 0.15s;
+}
+.status-select:focus { border-color: var(--brand); }
+
 /* ── Responsive ── */
 @media (max-width: 640px) {
     .nav-links a:not(.btn) { display: none; }
