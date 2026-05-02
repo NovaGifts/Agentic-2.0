@@ -16,8 +16,10 @@
             <span class="admin-company" th:text="${company.name}"></span>
             <a th:href="@{/admin/{id}/policies(id=${company.id})}"      class="admin-tab">Policy Rules</a>
             <a th:href="@{/companies/{id}/employees(id=${company.id})}" class="admin-tab">Employees</a>
-            <a th:href="@{/companies/{id}/calendar(id=${company.id})}"  class="admin-tab">Calendar</a>
+            <a th:href="@{/companies/{id}/events(id=${company.id})}"    class="admin-tab active">Upcoming Events</a>
+            <a th:href="@{/companies/{id}/approvals(id=${company.id})}" class="admin-tab">Approvals</a>
             <a th:href="@{/admin/{id}/audit(id=${company.id})}"         class="admin-tab">Audit Log</a>
+            <a href="/logout" class="btn btn-outline btn-sm">Logout</a>
         </div>
     </div>
 </nav>
@@ -27,53 +29,80 @@
     <div class="admin-header">
         <div>
             <div class="section-label">Upcoming Events</div>
-            <h1>Gift Recommendations</h1>
-            <p class="admin-sub">Auto-generated from your employee roster. Budgets follow your policy rules.</p>
+            <h1>Upcoming Events</h1>
+            <p class="admin-sub">Every recurring gifting moment, in one place. GiftNova runs the workflow — you just approve.</p>
         </div>
-        <a th:href="@{/companies/{id}/employees(id=${company.id})}" class="btn btn-outline">
-            ← Upload Employees
-        </a>
+        <div class="cal-summary">
+            <span class="count-badge" style="font-size:14px;padding:6px 16px;"
+                  th:text="${totalEvents} + ' upcoming events'"></span>
+        </div>
     </div>
 
-    <!-- Empty state — shown when no employees have been uploaded yet -->
-    <div class="admin-card" th:if="${#lists.isEmpty(events)}">
+    <!-- Empty state -->
+    <div class="admin-card" th:if="${eventsByMonth.isEmpty()}">
         <div class="empty-state">
-            <div class="empty-icon">🎁</div>
-            <p>No upcoming events yet.</p>
+            <div class="empty-icon">📅</div>
+            <p>No events yet.</p>
             <p style="margin-top:8px;">
-                <a th:href="@{/companies/{id}/employees(id=${company.id})}">Upload your employee CSV</a>
-                to start generating gift recommendations.
+                <a th:href="@{/companies/{id}/employees(id=${company.id})}">Upload employees</a>
+                to generate your upcoming events.
             </p>
         </div>
     </div>
 
-    <!-- Event cards — one per upcoming gift event -->
-    <div class="events-grid" th:unless="${#lists.isEmpty(events)}">
-        <div class="event-card" th:each="ev : ${events}">
+    <!-- One section per month -->
+    <div th:each="entry : ${eventsByMonth}" class="cal-month-block">
 
-            <!-- Employee initial avatar -->
-            <div class="event-avatar"
-                 th:text="${#strings.substring(ev.employeeName, 0, 1).toUpperCase()}"></div>
+        <div class="cal-month-header" th:text="${entry.key}"></div>
 
-            <div class="event-body">
-                <div class="event-who">
-                    <span class="event-name"  th:text="${ev.employeeName}"></span>
-                    <span class="event-badge" th:text="${ev.eventType.label}"></span>
-                </div>
+        <div class="admin-card">
+            <div class="table-wrap">
+                <table class="policy-table cal-table">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Employee</th>
+                            <th>Event</th>
+                            <th>Budget</th>
+                            <th>Status</th>
+                            <th>AI</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="ev : ${entry.value}">
 
-                <!-- Date formatted as "May 18" -->
-                <div class="event-date"
-                     th:text="${#temporals.format(ev.eventDate, 'MMMM d')}"></div>
+                            <td class="cal-date"
+                                th:text="${#temporals.format(ev.eventDate, 'MMM d')}"></td>
 
-                <div class="event-footer">
-                    <span class="event-budget">
-                        Suggested budget:
-                        <strong th:text="'$' + ${ev.suggestedBudget}"></strong>
-                    </span>
-                    <span class="status-badge" th:text="${ev.status}"></span>
-                </div>
+                            <td>
+                                <div class="cal-employee">
+                                    <div class="cal-avatar"
+                                         th:text="${#strings.substring(ev.employeeName,0,1).toUpperCase()}"></div>
+                                    <span th:text="${ev.employeeName}"></span>
+                                </div>
+                            </td>
+
+                            <td><span class="event-badge" th:text="${ev.eventType.label}"></span></td>
+
+                            <td class="cal-budget" th:text="'$' + ${ev.suggestedBudget}"></td>
+
+                            <td>
+                                <span th:if="${ev.status == 'LINK_SENT' or ev.status == 'SELECTION_PENDING' or ev.status == 'SENT'}"
+                                      class="cal-status status-link-sent">Link Sent</span>
+                                <span th:unless="${ev.status == 'LINK_SENT' or ev.status == 'SELECTION_PENDING' or ev.status == 'SENT'}"
+                                      class="cal-status status-needs-review">Not Sent</span>
+                            </td>
+
+                            <td>
+                                <a th:href="@{/companies/{cid}/recommendations/{eid}
+                                   (cid=${company.id},eid=${ev.id})}"
+                                   class="btn btn-primary btn-sm">AI Rec →</a>
+                            </td>
+
+                        </tr>
+                    </tbody>
+                </table>
             </div>
-
         </div>
     </div>
 

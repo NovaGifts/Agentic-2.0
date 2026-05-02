@@ -49,9 +49,21 @@ public class GiftRecommendation {
     @Column(name = "approval_required")
     private boolean approvalRequired;
 
-    // JSON array of warning strings (e.g. ["Budget exceeds policy limit"])
     @Column(name = "risk_flags", length = 1000)
     private String riskFlags;
+
+    // Fields populated by the employee on the recipient choice page
+    @Column(name = "selected_gift_id")
+    private String selectedGiftId;
+
+    @Column(name = "shipping_address", length = 500)
+    private String shippingAddress;
+
+    @Column(name = "thank_you_note", length = 1000)
+    private String thankYouNote;
+
+    @Column(name = "donation_chosen")
+    private boolean donationChosen;
 
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
@@ -78,5 +90,13 @@ public class GiftRecommendation {
     public void setApprovalRequired(boolean approvalRequired) { this.approvalRequired = approvalRequired; }
     public String getRiskFlags() { return riskFlags; }
     public void setRiskFlags(String riskFlags) { this.riskFlags = riskFlags; }
+    public String getSelectedGiftId() { return selectedGiftId; }
+    public void setSelectedGiftId(String selectedGiftId) { this.selectedGiftId = selectedGiftId; }
+    public String getShippingAddress() { return shippingAddress; }
+    public void setShippingAddress(String shippingAddress) { this.shippingAddress = shippingAddress; }
+    public String getThankYouNote() { return thankYouNote; }
+    public void setThankYouNote(String thankYouNote) { this.thankYouNote = thankYouNote; }
+    public boolean isDonationChosen() { return donationChosen; }
+    public void setDonationChosen(boolean donationChosen) { this.donationChosen = donationChosen; }
     public LocalDateTime getCreatedAt() { return createdAt; }
 }

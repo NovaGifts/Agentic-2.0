@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 /**
- * Handles the company onboarding setup flow (Phase 1).
+ * Handles the company onboarding setup flow.
  * After a company is created, default gift policies are seeded automatically.
  *
  * Routes:
@@ -48,6 +48,14 @@ public class CompanySetupController {
                          BindingResult result,
                          HttpSession session,
                          RedirectAttributes redirectAttrs) {
+        if (company.getPassword() == null || company.getPassword().isBlank()) {
+            result.rejectValue("password", "required", "Password is required.");
+            return "setup";
+        }
+        if (company.getPassword().length() < 6) {
+            result.rejectValue("password", "size", "Password must be at least 6 characters.");
+            return "setup";
+        }
         if (result.hasErrors()) {
             return "setup";
         }

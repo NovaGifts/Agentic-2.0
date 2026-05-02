@@ -12,7 +12,7 @@ import java.math.BigDecimal;
 import java.util.*;
 
 /**
- * Phase 5: AI Recommendation Engine
+ * AI Recommendation Engine
  *
  * Workflow:
  *   1. Build a structured prompt with employee/event/policy/catalog context

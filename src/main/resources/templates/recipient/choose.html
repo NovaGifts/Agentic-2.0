@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>GiftNova — Choose Your Gift</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}"/>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+</head>
+<body class="recipient-page">
+
+<nav class="navbar">
+    <div class="container nav-inner">
+        <a href="/" class="logo">Gift<span>Nova</span></a>
+    </div>
+</nav>
+
+<!-- Invalid link -->
+<div class="container" style="max-width:520px; padding-top:80px;" th:if="${error}">
+    <div class="recipient-card" style="text-align:center;">
+        <div style="font-size:48px; margin-bottom:16px;">❌</div>
+        <h2>Invalid link</h2>
+        <p style="color:var(--muted); margin-top:8px;" th:text="${error}"></p>
+    </div>
+</div>
+
+<!-- Gift selection -->
+<div th:unless="${error}">
+
+    <div class="recipient-hero">
+        <span class="hero-emoji">🎁</span>
+        <h1>You've got a gift!</h1>
+        <p>
+            Hi <strong th:text="${event.employeeName}"></strong>!
+            <span th:text="${company.name}"></span> is celebrating your
+            <strong th:text="${event.eventType.label}"></strong>.
+        </p>
+    </div>
+
+    <div class="container" style="max-width:720px; padding-bottom:60px;">
+
+        <!-- Message from HR -->
+        <div class="recipient-card"
+             th:if="${rec != null and rec.messageDraft != null and !#strings.isEmpty(rec.messageDraft)}">
+            <div class="section-label" style="margin-bottom:12px;">A note from your team</div>
+            <p class="recipient-message" th:text="${rec.messageDraft}"></p>
+        </div>
+
+        <form th:action="@{/gift/{t}(t=${event.recipientToken})}" method="post" id="giftForm">
+
+            <!-- Gift options -->
+            <div class="recipient-card">
+                <div class="section-label" style="margin-bottom:6px;">Your options</div>
+                <p style="font-size:14px; color:var(--muted); margin-bottom:20px;">
+                    Pick the one that feels most "you" — all options fit your company's gifting policy.
+                </p>
+
+                <div class="gift-choices">
+                    <!-- AI-recommended gifts -->
+                    <label th:each="gift : ${gifts}"
+                           class="gift-choice-card"
+                           th:for="'g-' + ${gift['id']}">
+                        <input type="radio" name="selectedGiftId"
+                               th:id="'g-' + ${gift['id']}"
+                               th:value="${gift['id']}"/>
+                        <div class="check-circle">✓</div>
+                        <div class="gift-choice-cat"  th:text="${gift['category']}"></div>
+                        <div class="gift-choice-name" th:text="${gift['name']}"></div>
+                        <div class="gift-choice-price" th:text="'$' + ${gift['price']}"></div>
+                        <div class="gift-choice-tags" th:text="${gift['tags']}"></div>
+                    </label>
+
+                    <!-- Donate option -->
+                    <label class="gift-choice-card gift-choice-donate" for="g-donation">
+                        <input type="radio" name="selectedGiftId" id="g-donation" value="donation"/>
+                        <div class="check-circle">✓</div>
+                        <div class="gift-choice-cat" style="color:#059669;">Give Back</div>
+                        <div class="gift-choice-name">Donate to Charity</div>
+                        <div class="gift-choice-price" style="color:#059669;"
+                             th:text="'~$' + ${rec != null ? rec.recommendedBudget : '50'}"></div>
+                        <div class="gift-choice-tags">100% to a cause you care about</div>
+                    </label>
+                </div>
+
+                <div id="selectionHint"
+                     style="display:none; color:#991B1B; font-size:13px; margin-top:12px; font-weight:500;">
+                    Please select one of the options above to continue.
+                </div>
+            </div>
+
+            <!-- Shipping address -->
+            <div class="recipient-card">
+                <div class="section-label" style="margin-bottom:6px;">Shipping address</div>
+                <p style="font-size:14px; color:var(--muted); margin-bottom:16px;">
+                    Required for physical items — leave blank for digital delivery.
+                </p>
+                <div class="recipient-address-section">
+                    <textarea name="shippingAddress" rows="3"
+                              placeholder="123 Main Street, Apt 4B&#10;San Francisco, CA 94102&#10;United States"></textarea>
+                </div>
+            </div>
+
+            <!-- Thank-you note -->
+            <div class="recipient-card">
+                <div class="section-label" style="margin-bottom:6px;">Send a thank-you (optional)</div>
+                <p style="font-size:14px; color:var(--muted); margin-bottom:16px;">
+                    Your note will be shared with your People Ops team.
+                </p>
+                <div class="recipient-address-section">
+                    <textarea name="thankYouNote" rows="3"
+                              placeholder="Thank you so much! This really made my day..."></textarea>
+                </div>
+            </div>
+
+            <!-- Submit -->
+            <div class="recipient-card" style="text-align:center;">
+                <button type="submit" class="btn btn-primary btn-lg" style="min-width:220px;"
+                        onclick="return validateSelection()">
+                    Claim my gift &rarr;
+                </button>
+                <p style="font-size:12px; color:var(--muted); margin-top:12px;">
+                    Your choice is final once submitted.
+                </p>
+            </div>
+
+        </form>
+    </div>
+</div>
+
+<script>
+    document.querySelectorAll('.gift-choice-card input[type="radio"]').forEach(radio => {
+        radio.addEventListener('change', () => {
+            document.querySelectorAll('.gift-choice-card').forEach(c => c.classList.remove('selected'));
+            radio.closest('.gift-choice-card').classList.add('selected');
+            document.getElementById('selectionHint').style.display = 'none';
+        });
+    });
+
+    function validateSelection() {
+        if (!document.querySelector('.gift-choice-card input[type="radio"]:checked')) {
+            const hint = document.getElementById('selectionHint');
+            hint.style.display = 'block';
+            hint.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            return false;
+        }
+        return true;
+    }
+</script>
+
+</body>
+</html>

@@ -16,7 +16,8 @@
             <span class="admin-company" th:text="${company.name}"></span>
             <a th:href="@{/admin/{id}/policies(id=${company.id})}"      class="admin-tab">Policy Rules</a>
             <a th:href="@{/companies/{id}/employees(id=${company.id})}" class="admin-tab">Employees</a>
-            <a th:href="@{/companies/{id}/calendar(id=${company.id})}"  class="admin-tab active">Calendar</a>
+            <a th:href="@{/companies/{id}/events(id=${company.id})}"    class="admin-tab active">Upcoming Events</a>
+            <a th:href="@{/companies/{id}/approvals(id=${company.id})}" class="admin-tab">Approvals</a>
             <a th:href="@{/admin/{id}/audit(id=${company.id})}"         class="admin-tab">Audit Log</a>
         </div>
     </div>
@@ -27,7 +28,7 @@
     <!-- Header -->
     <div class="admin-header">
         <div>
-            <div class="section-label">Phase 5 — AI Recommendation</div>
+            <div class="section-label">AI Recommendation</div>
             <h1 th:text="${event.employeeName}"></h1>
             <p class="admin-sub">
                 <span class="event-badge" th:text="${event.eventType.label}"></span>
@@ -35,11 +36,12 @@
                 <span th:text="${#temporals.format(event.eventDate, 'MMMM d, yyyy')}"></span>
             </p>
         </div>
-        <a th:href="@{/companies/{id}/calendar(id=${company.id})}" class="btn btn-outline">← Calendar</a>
+        <a th:href="@{/companies/{id}/events(id=${company.id})}" class="btn btn-outline">← Upcoming Events</a>
     </div>
 
-    <!-- AI error flash -->
-    <div class="alert-error" th:if="${aiError}" th:text="${aiError}"></div>
+    <!-- Flash messages -->
+    <div class="alert-error"   th:if="${aiError}" th:text="${aiError}"></div>
+    <div class="alert-success" th:if="${toast}"   th:text="${toast}"></div>
 
     <!-- No recommendation yet — show generate button -->
     <div class="admin-card" th:if="${rec == null}">
@@ -108,11 +110,15 @@
             </div>
         </div>
 
-        <!-- Regenerate -->
-        <div class="form-actions" style="margin-top:8px;">
+        <!-- Actions -->
+        <div class="form-actions" style="margin-top:8px; gap:12px; display:flex; flex-wrap:wrap;">
             <form th:action="@{/companies/{cid}/recommendations/generate/{eid}
                   (cid=${company.id},eid=${event.id})}" method="post">
                 <button type="submit" class="btn btn-outline">Regenerate Recommendation</button>
+            </form>
+            <form th:action="@{/companies/{cid}/recommendations/notify/{eid}
+                  (cid=${company.id},eid=${event.id})}" method="post">
+                <button type="submit" class="btn btn-primary">Send Mail to Employee</button>
             </form>
         </div>
     </div>

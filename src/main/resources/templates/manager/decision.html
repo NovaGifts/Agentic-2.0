@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>GiftNova — Decision Recorded</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Inter', sans-serif; background: #F9FAFB; display: flex; align-items: center; justify-content: center; min-height: 100vh; }
+        .card { background: #fff; border-radius: 16px; padding: 48px 40px; text-align: center; max-width: 440px; width: 100%; box-shadow: 0 4px 24px rgba(0,0,0,0.08); }
+        .icon { font-size: 56px; margin-bottom: 20px; }
+        h1 { font-size: 24px; font-weight: 700; color: #111; margin-bottom: 10px; }
+        p  { font-size: 15px; color: #6B7280; line-height: 1.6; }
+        .badge-approved { color: #166534; background: #DCFCE7; padding: 4px 14px; border-radius: 100px; font-weight: 600; font-size: 13px; display: inline-block; margin-top: 16px; }
+        .badge-rejected { color: #991B1B; background: #FEE2E2; padding: 4px 14px; border-radius: 100px; font-weight: 600; font-size: 13px; display: inline-block; margin-top: 16px; }
+    </style>
+</head>
+<body>
+<div class="card">
+    <div class="icon" th:text="${action == 'approved'} ? '✅' : '❌'"></div>
+    <h1 th:text="${action == 'approved'} ? 'Gift Approved!' : 'Gift Rejected'"></h1>
+    <p>
+        You have <strong th:text="${action}"></strong> the gift recommendation for
+        <strong th:text="${employeeName}"></strong>'s
+        <span th:text="${eventType}"></span>.
+    </p>
+    <div th:class="${action == 'approved'} ? 'badge-approved' : 'badge-rejected'"
+         th:text="${action == 'approved'} ? 'Decision recorded — HR has been notified.' : 'Decision recorded — HR has been notified.'">
+    </div>
+</div>
+</body>
+</html>

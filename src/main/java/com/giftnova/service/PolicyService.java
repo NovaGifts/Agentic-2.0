@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * Core business logic for Phase 2: Policy Builder.
+ * Core business logic for the Policy Builder.
  * Handles seeding default policies on company creation,
  * saving admin policy edits, and writing the audit log.
  */
@@ -86,11 +86,11 @@ public class PolicyService {
         // Update and audit company-level global settings
         Company company = companyService.findById(companyId);
         logIfChanged(companyId, "Company", "Restricted Categories",
-                company.getRestrictedCategories(), form.getRestrictedCategories(), changedBy);
+                str(company.getRestrictedCategories()), str(form.getRestrictedCategories()), changedBy);
         logIfChanged(companyId, "Company", "Allowed Departments",
-                company.getAllowedDepartments(), form.getAllowedDepartments(), changedBy);
+                str(company.getAllowedDepartments()), str(form.getAllowedDepartments()), changedBy);
         logIfChanged(companyId, "Company", "Allowed Locations",
-                company.getAllowedLocations(), form.getAllowedLocations(), changedBy);
+                str(company.getAllowedLocations()), str(form.getAllowedLocations()), changedBy);
 
         company.setRestrictedCategories(form.getRestrictedCategories());
         company.setAllowedDepartments(form.getAllowedDepartments());

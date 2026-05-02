@@ -17,7 +17,8 @@
             <span class="admin-company" th:text="${company.name}"></span>
             <a th:href="@{/admin/{id}/policies(id=${company.id})}"      class="admin-tab active">Policy Rules</a>
             <a th:href="@{/companies/{id}/employees(id=${company.id})}" class="admin-tab">Employees</a>
-            <a th:href="@{/companies/{id}/calendar(id=${company.id})}"  class="admin-tab">Calendar</a>
+            <a th:href="@{/companies/{id}/events(id=${company.id})}"    class="admin-tab">Upcoming Events</a>
+            <a th:href="@{/companies/{id}/approvals(id=${company.id})}" class="admin-tab">Approvals</a>
             <a th:href="@{/admin/{id}/audit(id=${company.id})}"         class="admin-tab">Audit Log</a>
             <a href="/" class="btn btn-outline">← Home</a>
         </div>
@@ -29,14 +30,14 @@
     <!-- PAGE HEADER -->
     <div class="admin-header">
         <div>
-            <div class="section-label">Phase 2</div>
+            <div class="section-label">Policy Rules</div>
             <h1>Policy Builder</h1>
             <p class="admin-sub">Define what GiftNova does automatically — by event, budget, and approval rule.</p>
         </div>
     </div>
 
-    <!-- SUCCESS FLASH -->
     <div class="alert-success" th:if="${successMessage}" th:text="${successMessage}"></div>
+    <div class="alert-error"   th:if="${errorMessage}"   th:text="${errorMessage}"></div>
 
     <form th:action="@{/admin/{id}/policies(id=${company.id})}"
           th:object="${policyForm}" method="post">
@@ -154,9 +155,6 @@
 
         <div class="form-actions">
             <button type="submit" class="btn btn-primary btn-lg">Save Policies</button>
-            <a th:href="@{/admin/{id}/audit(id=${company.id})}" class="btn btn-outline btn-lg">
-                View Audit Log →
-            </a>
         </div>
 
     </form>

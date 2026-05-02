@@ -16,7 +16,8 @@
             <span class="admin-company" th:text="${company.name}"></span>
             <a th:href="@{/admin/{id}/policies(id=${company.id})}"      class="admin-tab">Policy Rules</a>
             <a th:href="@{/companies/{id}/employees(id=${company.id})}" class="admin-tab">Employees</a>
-            <a th:href="@{/companies/{id}/calendar(id=${company.id})}"  class="admin-tab">Calendar</a>
+            <a th:href="@{/companies/{id}/events(id=${company.id})}"    class="admin-tab">Upcoming Events</a>
+            <a th:href="@{/companies/{id}/approvals(id=${company.id})}" class="admin-tab">Approvals</a>
             <a th:href="@{/admin/{id}/audit(id=${company.id})}"         class="admin-tab active">Audit Log</a>
             <a href="/" class="btn btn-outline">← Home</a>
         </div>

@@ -7,6 +7,7 @@ public class ApprovalItem {
     private UpcomingEvent event;
     private GiftRecommendation recommendation;
     private List<String> giftNames;
+    private String selectedGiftName;
 
     public UpcomingEvent getEvent() { return event; }
     public void setEvent(UpcomingEvent event) { this.event = event; }
@@ -14,4 +15,6 @@ public class ApprovalItem {
     public void setRecommendation(GiftRecommendation recommendation) { this.recommendation = recommendation; }
     public List<String> getGiftNames() { return giftNames; }
     public void setGiftNames(List<String> giftNames) { this.giftNames = giftNames; }
+    public String getSelectedGiftName() { return selectedGiftName; }
+    public void setSelectedGiftName(String selectedGiftName) { this.selectedGiftName = selectedGiftName; }
 }

@@ -40,9 +40,16 @@ public class UpcomingEvent {
     @Column(name = "suggested_budget", precision = 10, scale = 2)
     private BigDecimal suggestedBudget;
 
-    // PENDING → APPROVED → SENT (approval workflow comes in Phase 4)
     @Column(nullable = false)
     private String status = "PENDING";
+
+    // Secure UUID for employee gift selection — powers the /gift/{token} page
+    @Column(name = "recipient_token", unique = true)
+    private String recipientToken;
+
+    // Secure UUID for manager approve/reject without login — powers /manager/{token}/approve|reject
+    @Column(name = "manager_token", unique = true)
+    private String managerToken;
 
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
@@ -65,5 +72,9 @@ public class UpcomingEvent {
     public void setSuggestedBudget(BigDecimal suggestedBudget) { this.suggestedBudget = suggestedBudget; }
     public String getStatus() { return status; }
     public void setStatus(String status) { this.status = status; }
+    public String getRecipientToken() { return recipientToken; }
+    public void setRecipientToken(String recipientToken) { this.recipientToken = recipientToken; }
+    public String getManagerToken() { return managerToken; }
+    public void setManagerToken(String managerToken) { this.managerToken = managerToken; }
     public LocalDateTime getCreatedAt() { return createdAt; }
 }
