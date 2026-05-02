@@ -664,6 +664,58 @@ body.admin-page { background: var(--bg-alt); }
 }
 .meta-body { padding: 4px 28px 24px; font-size: 14px; color: var(--muted); line-height: 1.65; }
 
+/* ── Approval Queue ── */
+.queue-stats { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.q-stat {
+    font-size: 12px; font-weight: 700; padding: 4px 12px;
+    border-radius: 100px; white-space: nowrap;
+}
+.q-stat-pending  { background: #FEF9C3; color: #854D0E; }
+.q-stat-review   { background: #FEE2E2; color: #991B1B; }
+.q-stat-draft    { background: #DBEAFE; color: #1E40AF; }
+.q-stat-approved { background: #DCFCE7; color: #166534; }
+.q-stat-rejected { background: #F3F4F6; color: #6B7280; }
+
+.approval-table .action-cell { white-space: nowrap; min-width: 140px; }
+.approval-actions { display: flex; gap: 5px; align-items: center; }
+.approval-actions form { margin: 0; }
+
+.btn-action {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 30px; height: 30px; border-radius: 8px;
+    border: none; cursor: pointer; font-size: 13px;
+    transition: opacity 0.15s; text-decoration: none;
+}
+.btn-action:hover    { opacity: 0.75; }
+.btn-action-approve  { background: #DCFCE7; color: #166534; }
+.btn-action-reject   { background: #FEF2F2; color: #991B1B; }
+.btn-action-edit     { background: var(--brand-light); color: var(--brand); }
+.btn-action-review   { background: #FEF9C3; color: #854D0E; }
+
+.gift-tags-row { display: flex; flex-wrap: wrap; gap: 4px; max-width: 260px; }
+.gift-tag {
+    font-size: 11px; padding: 2px 8px;
+    background: var(--bg-alt); border: 1px solid var(--border);
+    border-radius: 100px; color: var(--muted); white-space: nowrap;
+}
+
+.policy-badge {
+    font-size: 11px; font-weight: 600;
+    padding: 3px 8px; border-radius: 100px; white-space: nowrap;
+}
+.policy-ok   { background: #DCFCE7; color: #166534; }
+.policy-warn { background: #FEF9C3; color: #854D0E; }
+.policy-bad  { background: #FEF2F2; color: #991B1B; }
+
+.event-date-small { font-size: 11px; color: var(--muted); margin-top: 2px; }
+
+.row-approved { opacity: 0.55; }
+.row-rejected { opacity: 0.4; }
+
+.cal-status.status-approved       { background: #DCFCE7; color: #166534; }
+.cal-status.status-rejected       { background: #FEF2F2; color: #991B1B; }
+.cal-status.status-draft-ready    { background: #DBEAFE; color: #1E40AF; }
+
 /* ── Responsive ── */
 @media (max-width: 640px) {
     .nav-links a:not(.btn) { display: none; }
