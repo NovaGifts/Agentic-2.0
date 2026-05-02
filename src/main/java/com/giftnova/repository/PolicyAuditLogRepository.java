@@ -8,4 +8,5 @@ import java.util.List;
 @Repository
 public interface PolicyAuditLogRepository extends JpaRepository<PolicyAuditLog, Long> {
     List<PolicyAuditLog> findByCompanyIdOrderByChangedAtDesc(Long companyId);
+    void deleteByCompanyId(Long companyId);
 }

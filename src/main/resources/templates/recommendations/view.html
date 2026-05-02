@@ -18,7 +18,24 @@
             <a th:href="@{/companies/{id}/employees(id=${company.id})}" class="admin-tab">Employees</a>
             <a th:href="@{/companies/{id}/events(id=${company.id})}"    class="admin-tab active">Upcoming Events</a>
             <a th:href="@{/companies/{id}/approvals(id=${company.id})}" class="admin-tab">Approvals</a>
+            <a th:href="@{/companies/{id}/analytics(id=${company.id})}" class="admin-tab">Analytics</a>
             <a th:href="@{/admin/{id}/audit(id=${company.id})}"         class="admin-tab">Audit Log</a>
+            <div class="profile-wrap">
+                <button class="profile-trigger" onclick="toggleProfileMenu(this)">Profile ▾</button>
+                <div class="profile-menu">
+                    <div class="profile-info">
+                        <div class="profile-info-name" th:text="${company.name}"></div>
+                        <div class="profile-info-website" th:text="${company.website}"></div>
+                    </div>
+                    <a th:href="@{/companies/{id}/change-password(id=${company.id})}" class="profile-item">Change Password</a>
+                    <form th:action="@{/companies/{id}/delete(id=${company.id})}" method="post">
+                        <input type="hidden" name="confirmPassword"/>
+                        <button type="button" class="profile-item profile-item-danger"
+                                onclick="confirmDelete(this.closest('form'))">Remove Account</button>
+                    </form>
+                    <a href="/logout" class="profile-item profile-item-logout">Logout</a>
+                </div>
+            </div>
         </div>
     </div>
 </nav>
@@ -124,5 +141,23 @@
     </div>
 
 </div>
+<script>
+function toggleProfileMenu(btn) {
+    const menu = btn.nextElementSibling;
+    menu.classList.toggle('open');
+    document.addEventListener('click', function close(e) {
+        if (!btn.parentElement.contains(e.target)) {
+            menu.classList.remove('open');
+            document.removeEventListener('click', close);
+        }
+    });
+}
+function confirmDelete(form) {
+    const pw = prompt('Enter your password to confirm account deletion:');
+    if (pw === null || pw.trim() === '') return;
+    form.querySelector('[name=confirmPassword]').value = pw;
+    form.submit();
+}
+</script>
 </body>
 </html>

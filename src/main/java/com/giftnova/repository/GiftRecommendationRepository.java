@@ -10,4 +10,5 @@ import java.util.Optional;
 public interface GiftRecommendationRepository extends JpaRepository<GiftRecommendation, Long> {
     Optional<GiftRecommendation> findByEventId(Long eventId);
     List<GiftRecommendation> findByCompanyId(Long companyId);
+    void deleteByCompanyId(Long companyId);
 }

@@ -65,6 +65,9 @@ public class GiftRecommendation {
     @Column(name = "donation_chosen")
     private boolean donationChosen;
 
+    @Column(name = "recipient_rating")
+    private Integer recipientRating;
+
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
 
@@ -98,5 +101,7 @@ public class GiftRecommendation {
     public void setThankYouNote(String thankYouNote) { this.thankYouNote = thankYouNote; }
     public boolean isDonationChosen() { return donationChosen; }
     public void setDonationChosen(boolean donationChosen) { this.donationChosen = donationChosen; }
+    public Integer getRecipientRating() { return recipientRating; }
+    public void setRecipientRating(Integer recipientRating) { this.recipientRating = recipientRating; }
     public LocalDateTime getCreatedAt() { return createdAt; }
 }
