@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>GiftNova — Upcoming Events</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}"/>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+</head>
+<body class="admin-page">
+
+<nav class="navbar">
+    <div class="container nav-inner">
+        <a href="/" class="logo">Gift<span>Nova</span></a>
+        <div class="nav-links">
+            <span class="admin-company" th:text="${company.name}"></span>
+            <a th:href="@{/admin/{id}/policies(id=${company.id})}"      class="admin-tab">Policy Rules</a>
+            <a th:href="@{/companies/{id}/employees(id=${company.id})}" class="admin-tab">Employees</a>
+            <a th:href="@{/companies/{id}/events(id=${company.id})}"    class="admin-tab active">Upcoming Events</a>
+            <a th:href="@{/admin/{id}/audit(id=${company.id})}"         class="admin-tab">Audit Log</a>
+        </div>
+    </div>
+</nav>
+
+<div class="admin-layout container">
+
+    <div class="admin-header">
+        <div>
+            <div class="section-label">Upcoming Events</div>
+            <h1>Gift Recommendations</h1>
+            <p class="admin-sub">Auto-generated from your employee roster. Budgets follow your policy rules.</p>
+        </div>
+        <a th:href="@{/companies/{id}/employees(id=${company.id})}" class="btn btn-outline">
+            ← Upload Employees
+        </a>
+    </div>
+
+    <!-- Empty state — shown when no employees have been uploaded yet -->
+    <div class="admin-card" th:if="${#lists.isEmpty(events)}">
+        <div class="empty-state">
+            <div class="empty-icon">🎁</div>
+            <p>No upcoming events yet.</p>
+            <p style="margin-top:8px;">
+                <a th:href="@{/companies/{id}/employees(id=${company.id})}">Upload your employee CSV</a>
+                to start generating gift recommendations.
+            </p>
+        </div>
+    </div>
+
+    <!-- Event cards — one per upcoming gift event -->
+    <div class="events-grid" th:unless="${#lists.isEmpty(events)}">
+        <div class="event-card" th:each="ev : ${events}">
+
+            <!-- Employee initial avatar -->
+            <div class="event-avatar"
+                 th:text="${#strings.substring(ev.employeeName, 0, 1).toUpperCase()}"></div>
+
+            <div class="event-body">
+                <div class="event-who">
+                    <span class="event-name"  th:text="${ev.employeeName}"></span>
+                    <span class="event-badge" th:text="${ev.eventType.label}"></span>
+                </div>
+
+                <!-- Date formatted as "May 18" -->
+                <div class="event-date"
+                     th:text="${#temporals.format(ev.eventDate, 'MMMM d')}"></div>
+
+                <div class="event-footer">
+                    <span class="event-budget">
+                        Suggested budget:
+                        <strong th:text="'$' + ${ev.suggestedBudget}"></strong>
+                    </span>
+                    <span class="status-badge" th:text="${ev.status}"></span>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+</div>
+</body>
+</html>

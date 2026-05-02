@@ -15,8 +15,10 @@
         <a href="/" class="logo">Gift<span>Nova</span></a>
         <div class="nav-links">
             <span class="admin-company" th:text="${company.name}"></span>
-            <a th:href="@{/admin/{id}/policies(id=${company.id})}" class="admin-tab active">Policy Rules</a>
-            <a th:href="@{/admin/{id}/audit(id=${company.id})}"    class="admin-tab">Audit Log</a>
+            <a th:href="@{/admin/{id}/policies(id=${company.id})}"      class="admin-tab active">Policy Rules</a>
+            <a th:href="@{/companies/{id}/employees(id=${company.id})}" class="admin-tab">Employees</a>
+            <a th:href="@{/companies/{id}/events(id=${company.id})}"    class="admin-tab">Upcoming Events</a>
+            <a th:href="@{/admin/{id}/audit(id=${company.id})}"         class="admin-tab">Audit Log</a>
             <a href="/" class="btn btn-outline">← Home</a>
         </div>
     </div>
