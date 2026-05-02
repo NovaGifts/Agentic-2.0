@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>GiftNova — Audit Log</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}"/>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+</head>
+<body class="admin-page">
+
+<nav class="navbar">
+    <div class="container nav-inner">
+        <a href="/" class="logo">Gift<span>Nova</span></a>
+        <div class="nav-links">
+            <span class="admin-company" th:text="${company.name}"></span>
+            <a th:href="@{/admin/{id}/policies(id=${company.id})}" class="admin-tab">Policy Rules</a>
+            <a th:href="@{/admin/{id}/audit(id=${company.id})}"    class="admin-tab active">Audit Log</a>
+            <a href="/" class="btn btn-outline">← Home</a>
+        </div>
+    </div>
+</nav>
+
+<div class="admin-layout container">
+
+    <div class="admin-header">
+        <div>
+            <div class="section-label">Audit Trail</div>
+            <h1>Policy Change Log</h1>
+            <p class="admin-sub">Every change to gifting policies is recorded here with who made it and when.</p>
+        </div>
+        <a th:href="@{/admin/{id}/policies(id=${company.id})}" class="btn btn-primary">← Back to Policies</a>
+    </div>
+
+    <div class="admin-card">
+        <!-- Empty state -->
+        <div class="empty-state" th:if="${#lists.isEmpty(logs)}">
+            <div class="empty-icon">📋</div>
+            <p>No policy changes yet. Changes will appear here after you save policies.</p>
+        </div>
+
+        <!-- Audit log table -->
+        <div class="table-wrap" th:unless="${#lists.isEmpty(logs)}">
+            <table class="policy-table audit-table">
+                <thead>
+                    <tr>
+                        <th>When</th>
+                        <th>Event Type</th>
+                        <th>Field Changed</th>
+                        <th>Old Value</th>
+                        <th>New Value</th>
+                        <th>Changed By</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="log : ${logs}">
+                        <td class="audit-time"
+                            th:text="${#temporals.format(log.changedAt, 'MMM d, yyyy HH:mm')}"></td>
+                        <td><span class="event-badge" th:text="${log.eventType}"></span></td>
+                        <td th:text="${log.fieldChanged}"></td>
+                        <td class="old-val" th:text="${log.oldValue ?: '—'}"></td>
+                        <td class="new-val" th:text="${log.newValue ?: '—'}"></td>
+                        <td th:text="${log.changedBy}"></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+
+</body>
+</html>

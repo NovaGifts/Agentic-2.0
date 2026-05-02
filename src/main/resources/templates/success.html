@@ -28,7 +28,11 @@
                 <li>First gift recommendations within 48 hours</li>
             </ul>
         </div>
-        <a href="/" class="btn btn-primary btn-lg">Back to Home</a>
+        <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
+            <a th:if="${companyId}" th:href="@{/admin/{id}/policies(id=${companyId})}"
+               class="btn btn-primary btn-lg">Configure Policies →</a>
+            <a href="/" class="btn btn-outline btn-lg">Back to Home</a>
+        </div>
     </div>
 </section>
 
