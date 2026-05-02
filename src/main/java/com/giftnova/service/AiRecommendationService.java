@@ -68,7 +68,7 @@ public class AiRecommendationService {
 
         // Step 1 — Ask local LLM for gift suggestions and message draft
         String prompt   = buildPrompt(event, policy);
-        String aiJson   = callAi(prompt);
+        String aiJson   = callAi(prompt, policy.getBudgetLimit());
 
         // Step 2 — Parse AI output and enforce policy deterministically
         GiftRecommendation rec = parseResponse(aiJson, event, policy);
@@ -85,51 +85,39 @@ public class AiRecommendationService {
 
     // Builds the prompt giving Claude full context: event, employee, policy, catalog
     private String buildPrompt(UpcomingEvent event, GiftPolicy policy) throws Exception {
-        String catalogJson = objectMapper.writeValueAsString(catalogService.getAll());
+        // Send only 10 gifts within budget to keep the prompt small enough for local models
+        java.math.BigDecimal limit = policy.getBudgetLimit();
+        List<java.util.Map<String, Object>> shortList = catalogService.getAll().stream()
+                .filter(g -> new java.math.BigDecimal(g.get("price").toString()).compareTo(limit) <= 0)
+                .limit(10)
+                .collect(java.util.stream.Collectors.toList());
+        String catalogJson = objectMapper.writeValueAsString(shortList);
+
         return """
-                You are a corporate gift recommendation engine for an HR platform called GiftNova.
+                You are a gift recommendation engine. Return ONLY valid JSON, no extra text.
 
-                CONTEXT:
-                - Employee: %s
-                - Event: %s
-                - Policy budget limit: $%s
-                - Approval required: %s
-                - Approval threshold: %s
+                Employee: %s | Event: %s | Budget limit: $%s
 
-                GIFT CATALOG (JSON):
+                Pick 3 gifts from this catalog:
                 %s
 
-                RULES:
-                1. Select exactly 3 gifts from the catalog whose price is at or below the budget limit.
-                2. Write a warm, professional 1-2 sentence message for the employee.
-                3. If any gift is above budget, add a risk flag.
-                4. Your job is to RECOMMEND only — budget and approval rules are enforced separately.
-
-                Return ONLY a valid JSON object (no markdown, no extra text):
-                {
-                  "event_type": "%s",
-                  "recommended_budget": <number within policy limit>,
-                  "recommended_gift_ids": ["id1", "id2", "id3"],
-                  "message_draft": "...",
-                  "reasoning": "...",
-                  "risk_flags": []
-                }
+                Return this exact JSON structure:
+                {"event_type":"%s","recommended_budget":%s,"recommended_gift_ids":["id1","id2","id3"],"message_draft":"...","reasoning":"...","risk_flags":[]}
                 """.formatted(
                 event.getEmployeeName(),
                 event.getEventType().getLabel(),
                 policy.getBudgetLimit(),
-                policy.isApprovalRequired(),
-                policy.getApprovalThreshold() != null ? "$" + policy.getApprovalThreshold() : "N/A",
                 catalogJson,
-                event.getEventType().name().toLowerCase()
+                event.getEventType().name().toLowerCase(),
+                policy.getBudgetLimit()
         );
     }
 
     // Calls the local LLM (Ollama) and returns the raw text response
     @SuppressWarnings("unchecked")
-    private String callAi(String prompt) {
+    private String callAi(String prompt, BigDecimal budgetLimit) {
         if (apiUrl == null || apiUrl.isBlank()) {
-            return mockResponse();
+            return mockResponse(budgetLimit);
         }
 
         HttpHeaders headers = new HttpHeaders();
@@ -224,17 +212,37 @@ public class AiRecommendationService {
         return cleaned.substring(start, end);
     }
 
-    // Mock response used when the API key is not configured — for demo purposes
-    private String mockResponse() {
+    // Mock response used when ai.api.url is blank — picks real catalog gifts within the budget
+    private String mockResponse(BigDecimal budgetLimit) {
+        List<Map<String, Object>> eligible = catalogService.getAll().stream()
+                .filter(g -> new BigDecimal(g.get("price").toString()).compareTo(budgetLimit) <= 0)
+                .limit(3)
+                .collect(java.util.stream.Collectors.toList());
+
+        if (eligible.isEmpty()) {
+            eligible = catalogService.getAll().stream().limit(3)
+                    .collect(java.util.stream.Collectors.toList());
+        }
+
+        List<String> ids = eligible.stream()
+                .map(g -> "\"" + g.get("id") + "\"")
+                .collect(java.util.stream.Collectors.toList());
+        String idsJson = "[" + String.join(",", ids) + "]";
+
+        BigDecimal budget = eligible.stream()
+                .map(g -> new BigDecimal(g.get("price").toString()))
+                .max(BigDecimal::compareTo)
+                .orElse(budgetLimit);
+
         return """
                 {
                   "event_type": "work_anniversary",
-                  "recommended_budget": 75,
-                  "recommended_gift_ids": ["gift_02", "gift_14", "gift_09"],
-                  "message_draft": "Congratulations on your work anniversary! We truly appreciate your dedication and the impact you bring to the team every day.",
-                  "reasoning": "Selected remote-friendly and experience gifts within the policy budget. These options work across locations and are meaningful for milestone anniversaries.",
+                  "recommended_budget": %s,
+                  "recommended_gift_ids": %s,
+                  "message_draft": "Wishing you a wonderful celebration! Your dedication and contributions mean so much to the team.",
+                  "reasoning": "Selected gifts within the policy budget limit of $%s. These options are versatile and well-suited for the occasion.",
                   "risk_flags": []
                 }
-                """;
+                """.formatted(budget, idsJson, budgetLimit);
     }
 }

@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>GiftNova — Edit Recommendation</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}"/>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+</head>
+<body class="admin-page">
+
+<nav class="navbar">
+    <div class="container nav-inner">
+        <a href="/" class="logo">Gift<span>Nova</span></a>
+        <div class="nav-links">
+            <span class="admin-company" th:text="${company.name}"></span>
+            <a th:href="@{/companies/{id}/approvals(id=${company.id})}" class="admin-tab active">Approvals</a>
+            <a href="/logout" class="btn btn-outline btn-sm">Logout</a>
+        </div>
+    </div>
+</nav>
+
+<div class="admin-layout container">
+
+    <!-- Header -->
+    <div class="admin-header">
+        <div>
+            <div class="section-label">Edit Recommendation</div>
+            <h1 th:text="${item.event.employeeName}"></h1>
+            <p class="admin-sub">
+                <span class="event-badge" th:text="${item.event.eventType.label}"></span>
+                &nbsp;·&nbsp;
+                <span th:text="${#temporals.format(item.event.eventDate,'MMMM d, yyyy')}"></span>
+            </p>
+        </div>
+        <a th:href="@{/companies/{id}/approvals(id=${company.id})}" class="btn btn-outline">← Back to Queue</a>
+    </div>
+
+    <!-- Gift tags (read-only) -->
+    <div class="admin-card">
+        <div class="admin-card-header">
+            <h2>AI Selected Gifts</h2>
+            <p>These gifts were chosen by the AI — edit message and budget below.</p>
+        </div>
+        <div class="gift-tags-row" style="padding: 0 28px 24px;">
+            <span class="gift-tag" th:each="name : ${item.giftNames}"
+                  style="font-size:13px; padding:5px 12px;"
+                  th:text="${name}"></span>
+        </div>
+    </div>
+
+    <!-- Edit form -->
+    <div class="admin-card">
+        <div class="admin-card-header">
+            <h2>Edit Message &amp; Budget</h2>
+            <p>Personalise the message draft or adjust the recommended budget.</p>
+        </div>
+        <form th:action="@{/companies/{cid}/approvals/{eid}/edit(cid=${company.id},eid=${item.event.id})}"
+              method="post" style="padding: 0 28px 28px; display:flex; flex-direction:column; gap:20px;">
+
+            <div class="form-group">
+                <label for="messageDraft">Message Draft</label>
+                <textarea id="messageDraft" name="messageDraft" rows="4"
+                          style="padding:11px 14px; border:1.5px solid var(--border); border-radius:var(--radius);
+                                 font-size:14px; font-family:inherit; width:100%; resize:vertical; outline:none;"
+                          th:text="${item.recommendation.messageDraft}"></textarea>
+            </div>
+
+            <div class="form-group" style="max-width:200px;">
+                <label for="budget">Budget ($)</label>
+                <div class="input-prefix">
+                    <span class="prefix">$</span>
+                    <input type="number" id="budget" name="budget" step="0.01" min="1"
+                           th:value="${item.recommendation.recommendedBudget}"/>
+                </div>
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary">Save &amp; Mark Draft Ready</button>
+                <a th:href="@{/companies/{id}/approvals(id=${company.id})}"
+                   class="btn btn-outline">Cancel</a>
+            </div>
+
+        </form>
+    </div>
+
+</div>
+</body>
+</html>
