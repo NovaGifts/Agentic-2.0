@@ -24,7 +24,7 @@ public class LoginController {
     @GetMapping("/login")
     public String showLogin(HttpSession session) {
         if (session.getAttribute("companyId") != null) {
-            return "redirect:/companies/" + session.getAttribute("companyId") + "/calendar";
+            return "redirect:/companies/" + session.getAttribute("companyId") + "/events";
         }
         return "login";
     }
@@ -39,7 +39,7 @@ public class LoginController {
                 && company.get().getPasswordHash() != null
                 && encoder.matches(password, company.get().getPasswordHash())) {
             session.setAttribute("companyId", company.get().getId());
-            return "redirect:/companies/" + company.get().getId() + "/calendar";
+            return "redirect:/companies/" + company.get().getId() + "/events";
         }
         model.addAttribute("error", "Invalid company name or password.");
         model.addAttribute("companyName", companyName);

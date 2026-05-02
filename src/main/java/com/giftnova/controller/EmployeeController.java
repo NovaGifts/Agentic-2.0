@@ -1,6 +1,7 @@
 package com.giftnova.controller;
 
 import com.giftnova.dto.CsvUploadResult;
+import com.giftnova.model.UpcomingEvent;
 import com.giftnova.repository.UpcomingEventRepository;
 import com.giftnova.service.CompanyService;
 import com.giftnova.service.EmployeeService;
@@ -9,9 +10,12 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
- * Handles Phase 3: Employee CSV upload and upcoming events display.
+ * Handles Employee CSV upload and upcoming events display.
  *
  * Routes:
  *   GET  /companies/{id}/employees        → upload form + employee list
@@ -60,11 +64,31 @@ public class EmployeeController {
         return "redirect:/companies/" + companyId + "/employees";
     }
 
-    // Shows upcoming events generated from employee birthdays and start dates
+    private static final DateTimeFormatter MONTH_FMT = DateTimeFormatter.ofPattern("MMMM yyyy");
+
     @GetMapping("/events")
     public String showEvents(@PathVariable Long companyId, Model model) {
-        model.addAttribute("company", companyService.findById(companyId));
-        model.addAttribute("events",  eventRepo.findByCompanyIdOrderByEventDate(companyId));
+        List<UpcomingEvent> all = eventRepo.findByCompanyIdOrderByEventDate(companyId);
+        Map<String, List<UpcomingEvent>> byMonth = all.stream()
+                .collect(Collectors.groupingBy(
+                        e -> e.getEventDate().format(MONTH_FMT),
+                        LinkedHashMap::new,
+                        Collectors.toList()
+                ));
+        model.addAttribute("company",       companyService.findById(companyId));
+        model.addAttribute("eventsByMonth", byMonth);
+        model.addAttribute("totalEvents",   all.size());
         return "employees/events";
+    }
+
+    @PostMapping("/events/{eventId}/status")
+    public String updateEventStatus(@PathVariable Long companyId,
+                                    @PathVariable Long eventId,
+                                    @RequestParam String status) {
+        UpcomingEvent ev = eventRepo.findById(eventId)
+                .orElseThrow(() -> new IllegalArgumentException("Event not found: " + eventId));
+        ev.setStatus(status);
+        eventRepo.save(ev);
+        return "redirect:/companies/" + companyId + "/events";
     }
 }

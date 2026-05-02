@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>GiftNova — Gift Submitted!</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}"/>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+</head>
+<body class="recipient-page">
+
+<nav class="navbar">
+    <div class="container nav-inner">
+        <a href="/" class="logo">Gift<span>Nova</span></a>
+    </div>
+</nav>
+
+<div class="recipient-hero" style="padding-bottom:24px;">
+    <span class="hero-emoji">🎉</span>
+    <h1>You're all set!</h1>
+    <p>
+        <strong th:text="${event.employeeName}"></strong>,
+        your selection has been sent to <span th:text="${company.name}"></span> for confirmation.
+    </p>
+</div>
+
+<div class="container" style="max-width:540px; padding-bottom:60px;">
+    <div class="recipient-card" style="text-align:center;">
+
+        <div style="font-size:48px; margin-bottom:16px;">🎁</div>
+        <div class="section-label" style="margin-bottom:8px;">You selected</div>
+        <h2 style="font-size:22px; font-weight:800; margin-bottom:16px;" th:text="${selectedName}"></h2>
+
+        <p style="font-size:14px; color:var(--muted); margin-bottom:24px;">
+            <strong th:text="${company.name}"></strong> will confirm your gift and be in touch with next steps.
+        </p>
+
+        <!-- Display thank-you note if the employee wrote one -->
+        <div th:if="${thankYouNote != null and !#strings.isEmpty(thankYouNote)}"
+             style="background:var(--bg-alt); border-radius:12px; padding:16px 20px; text-align:left;">
+            <div class="section-label" style="margin-bottom:8px;">Your thank-you note</div>
+            <p style="font-size:14px; font-style:italic; color:var(--text); margin:0;"
+               th:text="${thankYouNote}"></p>
+        </div>
+
+    </div>
+</div>
+
+</body>
+</html>

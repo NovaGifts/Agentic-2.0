@@ -3,6 +3,7 @@ package com.giftnova.controller;
 import com.giftnova.model.ApprovalItem;
 import com.giftnova.service.ApprovalService;
 import com.giftnova.service.CompanyService;
+import com.giftnova.service.EmailService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -17,29 +18,28 @@ public class ApprovalController {
 
     private final ApprovalService approvalService;
     private final CompanyService  companyService;
+    private final EmailService    emailService;
 
-    public ApprovalController(ApprovalService approvalService, CompanyService companyService) {
+    public ApprovalController(ApprovalService approvalService, CompanyService companyService,
+                               EmailService emailService) {
         this.approvalService = approvalService;
         this.companyService  = companyService;
+        this.emailService    = emailService;
     }
 
     @GetMapping
     public String queue(@PathVariable Long companyId, Model model) {
         List<ApprovalItem> queue = approvalService.getQueue(companyId);
 
-        long pendingCount  = queue.stream().filter(i -> "NEEDS_REVIEW".equals(i.getEvent().getStatus())).count();
-        long reviewCount   = queue.stream().filter(i -> "APPROVAL_NEEDED".equals(i.getEvent().getStatus())).count();
-        long draftCount    = queue.stream().filter(i -> "DRAFT_READY".equals(i.getEvent().getStatus())).count();
-        long approvedCount = queue.stream().filter(i -> "APPROVED".equals(i.getEvent().getStatus())).count();
-        long rejectedCount = queue.stream().filter(i -> "REJECTED".equals(i.getEvent().getStatus())).count();
+        long selectionCount = queue.stream().filter(i -> "SELECTION_PENDING".equals(i.getEvent().getStatus())).count();
+        long approvedCount  = queue.stream().filter(i -> "APPROVED".equals(i.getEvent().getStatus())).count();
+        long rejectedCount  = queue.stream().filter(i -> "REJECTED".equals(i.getEvent().getStatus())).count();
 
-        model.addAttribute("company",       companyService.findById(companyId));
-        model.addAttribute("queue",         queue);
-        model.addAttribute("pendingCount",  pendingCount);
-        model.addAttribute("reviewCount",   reviewCount);
-        model.addAttribute("draftCount",    draftCount);
-        model.addAttribute("approvedCount", approvedCount);
-        model.addAttribute("rejectedCount", rejectedCount);
+        model.addAttribute("company",        companyService.findById(companyId));
+        model.addAttribute("queue",          queue);
+        model.addAttribute("selectionCount", selectionCount);
+        model.addAttribute("approvedCount",  approvedCount);
+        model.addAttribute("rejectedCount",  rejectedCount);
         return "approvals/index";
     }
 
@@ -92,10 +92,30 @@ public class ApprovalController {
         return "redirect:/companies/" + companyId + "/approvals";
     }
 
-    @PostMapping("/seed-demo")
-    public String seedDemo(@PathVariable Long companyId, RedirectAttributes ra) {
-        approvalService.seedDemo(companyId);
-        ra.addFlashAttribute("toast", "Demo data loaded.");
+    // HR sends the gift-choice link to the employee (generates token + optional email)
+    @PostMapping("/{eventId}/send-link")
+    public String sendLink(@PathVariable Long companyId,
+                           @PathVariable Long eventId,
+                           RedirectAttributes ra) {
+        String url = approvalService.sendLink(companyId, eventId);
+        if (url != null) {
+            ra.addFlashAttribute("recipientLink", url);
+            String msg = emailService.isConfigured()
+                    ? "Email sent to employee! Link also shown below."
+                    : "Link ready — copy it below to share with the employee (SMTP not configured).";
+            ra.addFlashAttribute("toast", msg);
+        }
         return "redirect:/companies/" + companyId + "/approvals";
     }
+
+    // HR confirms the employee's chosen gift → status becomes SENT
+    @PostMapping("/{eventId}/approve-selection")
+    public String approveSelection(@PathVariable Long companyId,
+                                   @PathVariable Long eventId,
+                                   RedirectAttributes ra) {
+        approvalService.approveSelection(eventId);
+        ra.addFlashAttribute("toast", "Gift confirmed! The employee's selection has been approved.");
+        return "redirect:/companies/" + companyId + "/approvals";
+    }
+
 }

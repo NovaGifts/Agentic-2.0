@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 /**
- * Handles the Phase 2 Policy Builder admin screens.
+ * Handles the Policy Builder admin screens.
  *
  * Routes:
  *   GET  /admin                        → redirects to latest company's policies (demo shortcut)
@@ -63,11 +63,14 @@ public class PolicyController {
     public String savePolicies(@PathVariable Long companyId,
                                 @ModelAttribute PolicyForm policyForm,
                                 RedirectAttributes redirectAttrs) {
-        Company company = companyService.findById(companyId);
-        // Use admin email as the "who changed it" identifier in the audit log
-        policyService.updatePolicies(companyId, policyForm, company.getAdminEmail());
-        redirectAttrs.addFlashAttribute("successMessage", "Policies saved successfully.");
-        return "redirect:/admin/" + companyId + "/policies";
+        try {
+            Company company = companyService.findById(companyId);
+            policyService.updatePolicies(companyId, policyForm, company.getAdminEmail());
+        } catch (Exception e) {
+            redirectAttrs.addFlashAttribute("errorMessage", "Could not save policies: " + e.getMessage());
+            return "redirect:/admin/" + companyId + "/policies";
+        }
+        return "redirect:/companies/" + companyId + "/employees";
     }
 
     // Shows the full audit trail of all policy changes for this company

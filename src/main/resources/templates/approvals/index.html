@@ -16,7 +16,7 @@
             <span class="admin-company" th:text="${company.name}"></span>
             <a th:href="@{/admin/{id}/policies(id=${company.id})}"      class="admin-tab">Policy Rules</a>
             <a th:href="@{/companies/{id}/employees(id=${company.id})}" class="admin-tab">Employees</a>
-            <a th:href="@{/companies/{id}/calendar(id=${company.id})}"  class="admin-tab">Calendar</a>
+            <a th:href="@{/companies/{id}/events(id=${company.id})}"    class="admin-tab">Upcoming Events</a>
             <a th:href="@{/companies/{id}/approvals(id=${company.id})}" class="admin-tab active">Approvals</a>
             <a th:href="@{/admin/{id}/audit(id=${company.id})}"         class="admin-tab">Audit Log</a>
             <a href="/logout" class="btn btn-outline btn-sm">Logout</a>
@@ -29,22 +29,43 @@
     <!-- Header -->
     <div class="admin-header">
         <div>
-            <div class="section-label">Phase 6</div>
+            <div class="section-label">Gift Approvals</div>
             <h1>Approval Queue</h1>
-            <p class="admin-sub">Review AI recommendations, approve gifts, edit messages, or escalate for manager sign-off.</p>
+            <p class="admin-sub">Review AI picks → approve → send gift link to employee → confirm their selection.</p>
         </div>
         <!-- Live stats -->
         <div class="queue-stats">
-            <span class="q-stat q-stat-pending"  th:text="${pendingCount}  + ' Needs Review'"></span>
-            <span class="q-stat q-stat-review"   th:if="${reviewCount > 0}"   th:text="${reviewCount}  + ' Manager Review'"></span>
-            <span class="q-stat q-stat-draft"    th:if="${draftCount > 0}"    th:text="${draftCount}   + ' Draft Ready'"></span>
-            <span class="q-stat q-stat-approved" th:if="${approvedCount > 0}" th:text="${approvedCount}+ ' Approved'"></span>
-            <span class="q-stat q-stat-rejected" th:if="${rejectedCount > 0}" th:text="${rejectedCount}+ ' Rejected'"></span>
+            <span class="q-stat q-stat-selection" th:if="${selectionCount > 0}" th:text="${selectionCount} + ' No Response Yet'"></span>
+            <span class="q-stat q-stat-sent"      th:if="${approvedCount > 0}"  th:text="${approvedCount}  + ' Accepted'"></span>
+            <span class="q-stat q-stat-rejected"  th:if="${rejectedCount > 0}"  th:text="${rejectedCount}  + ' Rejected'"></span>
+        </div>
+    </div>
+
+    <!-- Workflow steps -->
+    <div class="admin-card workflow-steps-card">
+        <div class="workflow-steps">
+            <div class="workflow-step"><div class="step-num">1</div><div class="step-label">Review AI Picks</div></div>
+            <div class="workflow-arrow">→</div>
+            <div class="workflow-step"><div class="step-num">2</div><div class="step-label">Approve</div></div>
+            <div class="workflow-arrow">→</div>
+            <div class="workflow-step"><div class="step-num">3</div><div class="step-label">Send Link to Employee</div></div>
+            <div class="workflow-arrow">→</div>
+            <div class="workflow-step"><div class="step-num">4</div><div class="step-label">Employee Picks Gift</div></div>
+            <div class="workflow-arrow">→</div>
+            <div class="workflow-step"><div class="step-num">5</div><div class="step-label">HR Confirms &amp; Sends</div></div>
         </div>
     </div>
 
     <!-- Toast -->
     <div class="alert-success" th:if="${toast}" th:text="${toast}"></div>
+
+    <!-- Recipient link banner — appears after "Send Gift Link" is clicked -->
+    <div class="recipient-link-banner" th:if="${recipientLink}">
+        <span style="font-weight:600; white-space:nowrap;">🔗 Gift link ready</span>
+        <code style="font-size:12px; word-break:break-all; flex:1;" th:text="${recipientLink}"></code>
+        <button class="btn btn-outline btn-sm" type="button"
+                th:attr="data-url=${recipientLink}" onclick="copyGiftLink(this)">Copy</button>
+    </div>
 
     <!-- Empty state -->
     <div class="admin-card" th:if="${queue.isEmpty()}">
@@ -52,12 +73,9 @@
             <div class="empty-icon">📋</div>
             <p>No recommendations in the queue yet.</p>
             <p style="margin-top:6px; font-size:13px; color:var(--muted)">
-                Generate AI recommendations from the Calendar, or load demo data below.
+                Go to the <a th:href="@{/companies/{id}/events(id=${company.id})}">Upcoming Events</a>
+                and click <strong>AI Rec →</strong> on any event to generate recommendations.
             </p>
-            <form th:action="@{/companies/{cid}/approvals/seed-demo(cid=${company.id})}" method="post"
-                  style="margin-top:20px;">
-                <button type="submit" class="btn btn-primary">Load Demo Data →</button>
-            </form>
         </div>
     </div>
 
@@ -69,17 +87,17 @@
                     <tr>
                         <th>Employee</th>
                         <th>Event</th>
-                        <th>AI Suggestion</th>
+                        <th>Gift Selected</th>
                         <th>Budget</th>
-                        <th>Policy Fit</th>
                         <th>Status</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr th:each="item : ${queue}"
-                        th:classappend="${item.event.status == 'APPROVED'} ? 'row-approved' :
-                                        (${item.event.status == 'REJECTED'} ? 'row-rejected' : '')">
+                        th:classappend="${item.event.status == 'SENT'} ? 'row-approved' :
+                                        (${item.event.status == 'REJECTED'} ? 'row-rejected' :
+                                        (${item.event.status == 'SELECTION_PENDING'} ? 'row-selection-pending' : ''))">
 
                         <!-- Employee -->
                         <td>
@@ -97,49 +115,24 @@
                                  th:text="${#temporals.format(item.event.eventDate,'MMM d')}"></div>
                         </td>
 
-                        <!-- AI Suggestion -->
+                        <!-- Gift Selected by Employee -->
                         <td>
-                            <div class="gift-tags-row">
-                                <span class="gift-tag" th:each="name : ${item.giftNames}" th:text="${name}"></span>
-                            </div>
+                            <span class="gift-tag" style="font-size:12px; padding:4px 10px; background:#DCFCE7; border-color:#BBF7D0; color:#166534;"
+                                  th:text="${item.selectedGiftName != null ? item.selectedGiftName : '—'}"></span>
                         </td>
 
                         <!-- Budget -->
                         <td class="cal-budget"
                             th:text="'$' + ${item.recommendation.recommendedBudget}"></td>
 
-                        <!-- Policy Fit -->
+                        <!-- Manager Decision Status -->
                         <td>
-                            <span th:if="${item.recommendation.policyStatus == 'compliant' and !item.recommendation.approvalRequired}"
-                                  class="policy-badge policy-ok">✓ Compliant</span>
-                            <span th:if="${item.recommendation.approvalRequired}"
-                                  class="policy-badge policy-warn">⚠ Approval Needed</span>
-                            <span th:if="${item.recommendation.policyStatus != 'compliant' and !item.recommendation.approvalRequired}"
-                                  class="policy-badge policy-bad">✗ Non-Compliant</span>
-                        </td>
-
-                        <!-- Status -->
-                        <td>
-                            <span class="cal-status"
-                                  th:classappend="'status-' + ${item.event.status.toLowerCase().replace('_','-')}"
-                                  th:text="${item.event.status.replace('_',' ')}"></span>
-                        </td>
-
-                        <!-- Actions -->
-                        <td class="action-cell">
-                            <div class="approval-actions">
-                                <form th:action="@{/companies/{cid}/approvals/{eid}/approve(cid=${company.id},eid=${item.event.id})}" method="post">
-                                    <button type="submit" class="btn-action btn-action-approve" title="Approve">✓</button>
-                                </form>
-                                <a th:href="@{/companies/{cid}/approvals/{eid}/edit(cid=${company.id},eid=${item.event.id})}"
-                                   class="btn-action btn-action-edit" title="Edit message &amp; budget">✏</a>
-                                <form th:action="@{/companies/{cid}/approvals/{eid}/review(cid=${company.id},eid=${item.event.id})}" method="post">
-                                    <button type="submit" class="btn-action btn-action-review" title="Request manager review">👤</button>
-                                </form>
-                                <form th:action="@{/companies/{cid}/approvals/{eid}/reject(cid=${company.id},eid=${item.event.id})}" method="post">
-                                    <button type="submit" class="btn-action btn-action-reject" title="Reject">✕</button>
-                                </form>
-                            </div>
+                            <span th:if="${item.event.status == 'SELECTION_PENDING'}"
+                                  class="cal-status status-link-sent">No Response Yet</span>
+                            <span th:if="${item.event.status == 'APPROVED'}"
+                                  class="cal-status status-approved">✓ Accepted</span>
+                            <span th:if="${item.event.status == 'REJECTED'}"
+                                  class="cal-status status-rejected">✕ Rejected</span>
                         </td>
 
                     </tr>
@@ -148,17 +141,16 @@
         </div>
     </div>
 
-    <!-- Reload demo link when queue has data -->
-    <div th:unless="${queue.isEmpty()}" style="text-align:right; margin-top:-12px;">
-        <form th:action="@{/companies/{cid}/approvals/seed-demo(cid=${company.id})}" method="post"
-              style="display:inline;">
-            <button type="submit"
-                    style="background:none;border:none;font-size:12px;color:var(--muted);cursor:pointer;text-decoration:underline;">
-                Reload demo data
-            </button>
-        </form>
-    </div>
 
 </div>
+
+<script>
+function copyGiftLink(btn) {
+    navigator.clipboard.writeText(btn.dataset.url).then(() => {
+        btn.textContent = 'Copied!';
+        setTimeout(() => btn.textContent = 'Copy', 2500);
+    }).catch(() => prompt('Copy this link:', btn.dataset.url));
+}
+</script>
 </body>
 </html>

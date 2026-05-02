@@ -88,8 +88,6 @@ public class Company {
 
     // Used only for form binding during setup — never persisted to DB
     @Transient
-    @NotBlank(message = "Password is required")
-    @Size(min = 6, message = "Password must be at least 6 characters")
     private String password;
 
     @Column(name = "created_at", nullable = false, updatable = false)
