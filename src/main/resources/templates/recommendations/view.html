@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>GiftNova — AI Recommendation</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}"/>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+</head>
+<body class="admin-page">
+
+<nav class="navbar">
+    <div class="container nav-inner">
+        <a href="/" class="logo">Gift<span>Nova</span></a>
+        <div class="nav-links">
+            <span class="admin-company" th:text="${company.name}"></span>
+            <a th:href="@{/admin/{id}/policies(id=${company.id})}"      class="admin-tab">Policy Rules</a>
+            <a th:href="@{/companies/{id}/employees(id=${company.id})}" class="admin-tab">Employees</a>
+            <a th:href="@{/companies/{id}/calendar(id=${company.id})}"  class="admin-tab active">Calendar</a>
+            <a th:href="@{/admin/{id}/audit(id=${company.id})}"         class="admin-tab">Audit Log</a>
+        </div>
+    </div>
+</nav>
+
+<div class="admin-layout container">
+
+    <!-- Header -->
+    <div class="admin-header">
+        <div>
+            <div class="section-label">Phase 5 — AI Recommendation</div>
+            <h1 th:text="${event.employeeName}"></h1>
+            <p class="admin-sub">
+                <span class="event-badge" th:text="${event.eventType.label}"></span>
+                &nbsp;·&nbsp;
+                <span th:text="${#temporals.format(event.eventDate, 'MMMM d, yyyy')}"></span>
+            </p>
+        </div>
+        <a th:href="@{/companies/{id}/calendar(id=${company.id})}" class="btn btn-outline">← Calendar</a>
+    </div>
+
+    <!-- AI error flash -->
+    <div class="alert-error" th:if="${aiError}" th:text="${aiError}"></div>
+
+    <!-- No recommendation yet — show generate button -->
+    <div class="admin-card" th:if="${rec == null}">
+        <div class="empty-state">
+            <div class="empty-icon">🤖</div>
+            <p>No AI recommendation generated yet.</p>
+            <form th:action="@{/companies/{cid}/recommendations/generate/{eid}
+                  (cid=${company.id},eid=${event.id})}" method="post" style="margin-top:20px;">
+                <button type="submit" class="btn btn-primary btn-lg">Generate AI Recommendation</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Recommendation view -->
+    <div th:if="${rec != null}">
+
+        <!-- Policy status banner -->
+        <div class="policy-banner"
+             th:classappend="${rec.policyStatus == 'compliant'} ? 'banner-compliant' : 'banner-non-compliant'">
+            <span th:if="${rec.policyStatus == 'compliant'}">✓ Policy Compliant — within budget</span>
+            <span th:if="${rec.policyStatus != 'compliant'}">⚠ Policy Violation — review required</span>
+            <span th:if="${rec.approvalRequired}" class="approval-tag">Approval Required</span>
+        </div>
+
+        <!-- 3 Gift Options -->
+        <div class="admin-card">
+            <div class="admin-card-header">
+                <h2>Recommended Gifts
+                    <span class="count-badge" th:text="'Budget: $' + ${rec.recommendedBudget}"></span>
+                </h2>
+                <p>AI selected 3 options from the catalog. HR chooses which one to send.</p>
+            </div>
+            <div class="gift-grid">
+                <div class="gift-card" th:each="gift : ${giftDetails}">
+                    <div class="gift-category" th:text="${gift.category}"></div>
+                    <div class="gift-name"     th:text="${gift.name}"></div>
+                    <div class="gift-price"    th:text="'$' + ${gift.price}"></div>
+                    <div class="gift-tags"     th:text="${gift.tags}"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Message Draft -->
+        <div class="admin-card">
+            <div class="admin-card-header">
+                <h2>Message Draft</h2>
+                <p>Written by AI — review and edit before sending.</p>
+            </div>
+            <div class="message-box" th:text="${rec.messageDraft}"></div>
+        </div>
+
+        <!-- Reasoning + Risk Flags -->
+        <div class="rec-meta-grid">
+            <div class="admin-card">
+                <div class="admin-card-header"><h2>AI Reasoning</h2></div>
+                <p class="meta-body" th:text="${rec.reasoning}"></p>
+            </div>
+            <div class="admin-card">
+                <div class="admin-card-header"><h2>Risk Flags</h2></div>
+                <div th:if="${riskFlagsList.isEmpty()}" class="meta-body" style="color:var(--success)">
+                    ✓ No risk flags
+                </div>
+                <div th:unless="${riskFlagsList.isEmpty()}" class="meta-body alert-error">
+                    <div th:each="flag : ${riskFlagsList}" th:text="${flag}"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Regenerate -->
+        <div class="form-actions" style="margin-top:8px;">
+            <form th:action="@{/companies/{cid}/recommendations/generate/{eid}
+                  (cid=${company.id},eid=${event.id})}" method="post">
+                <button type="submit" class="btn btn-outline">Regenerate Recommendation</button>
+            </form>
+        </div>
+    </div>
+
+</div>
+</body>
+</html>

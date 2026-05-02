@@ -34,6 +34,10 @@ public class CompanyService {
                 .orElseThrow(() -> new IllegalArgumentException("Company not found: " + id));
     }
 
+    public java.util.Optional<Company> findByName(String name) {
+        return companyRepository.findByName(name);
+    }
+
     // Returns the most recently created company — used by /admin to auto-redirect in demo mode
     public Company findLatest() {
         return companyRepository.findTopByOrderByCreatedAtDesc()

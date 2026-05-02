@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>GiftNova — Log In or Sign Up</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}"/>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+    <style>
+        .auth-divider {
+            display: flex; align-items: center; gap: 12px;
+            margin: 28px 0; color: var(--muted); font-size: 13px;
+        }
+        .auth-divider::before,
+        .auth-divider::after {
+            content: ''; flex: 1;
+            height: 1px; background: var(--border);
+        }
+        .signup-card {
+            background: var(--bg-alt);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 20px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+        }
+        .signup-card-text p  { font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 2px; }
+        .signup-card-text span { font-size: 13px; color: var(--muted); }
+    </style>
+</head>
+<body class="form-page">
+
+<nav class="navbar">
+    <div class="container nav-inner">
+        <a href="/" class="logo">Gift<span>Nova</span></a>
+    </div>
+</nav>
+
+<section class="form-section">
+    <div class="form-card">
+
+        <!-- Header -->
+        <div class="form-header">
+            <div class="section-label">GiftNova</div>
+            <h1>Welcome</h1>
+            <p>Log in to your company or create a new one.</p>
+        </div>
+
+        <!-- Error -->
+        <div class="alert-error" th:if="${error}" th:text="${error}"></div>
+
+        <!-- Log In form -->
+        <form action="/login" method="post" class="setup-form" novalidate>
+
+            <div class="form-group">
+                <label for="companyName">Company Name</label>
+                <input type="text" id="companyName" name="companyName"
+                       th:value="${companyName}" placeholder="e.g. Acme Corp" required/>
+            </div>
+
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password"
+                       placeholder="Your password" required/>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-full btn-lg">
+                Log In &rarr;
+            </button>
+
+        </form>
+
+        <!-- Divider -->
+        <div class="auth-divider">or</div>
+
+        <!-- Sign Up card -->
+        <div class="signup-card">
+            <div class="signup-card-text">
+                <p>New to GiftNova?</p>
+                <span>Set up your company in under 5 minutes.</span>
+            </div>
+            <a href="/setup" class="btn btn-outline">Sign Up &rarr;</a>
+        </div>
+
+    </div>
+</section>
+
+</body>
+</html>

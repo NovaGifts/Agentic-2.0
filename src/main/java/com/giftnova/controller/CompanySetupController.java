@@ -3,7 +3,9 @@ package com.giftnova.controller;
 import com.giftnova.model.Company;
 import com.giftnova.service.CompanyService;
 import com.giftnova.service.PolicyService;
+import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -25,10 +27,13 @@ public class CompanySetupController {
 
     private final CompanyService companyService;
     private final PolicyService policyService;
+    private final BCryptPasswordEncoder encoder;
 
-    public CompanySetupController(CompanyService companyService, PolicyService policyService) {
+    public CompanySetupController(CompanyService companyService, PolicyService policyService,
+                                   BCryptPasswordEncoder encoder) {
         this.companyService = companyService;
         this.policyService  = policyService;
+        this.encoder        = encoder;
     }
 
     // Shows the blank company setup form
@@ -41,22 +46,22 @@ public class CompanySetupController {
     @PostMapping
     public String submit(@Valid @ModelAttribute("company") Company company,
                          BindingResult result,
+                         HttpSession session,
                          RedirectAttributes redirectAttrs) {
-        // Return to form if validation annotations (@NotBlank, @Email, etc.) failed
         if (result.hasErrors()) {
             return "setup";
         }
-        // Prevent duplicate company names
         if (companyService.exists(company.getName())) {
             result.rejectValue("name", "duplicate", "A company with this name already exists.");
             return "setup";
         }
+        company.setPasswordHash(encoder.encode(company.getPassword()));
         Company saved = companyService.save(company);
-
-        // Seed the four default gift policies (Birthday, Work Anniversary, Onboarding, Manager Appreciation)
         policyService.initDefaults(saved.getId());
 
-        // Pass companyId via flash so the success page can link to the policy builder
+        // Auto-login after signup
+        session.setAttribute("companyId", saved.getId());
+
         redirectAttrs.addFlashAttribute("successMessage",
                 "Welcome aboard, " + saved.getName() + "! Your pilot is ready.");
         redirectAttrs.addFlashAttribute("companyId", saved.getId());

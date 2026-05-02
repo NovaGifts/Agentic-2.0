@@ -18,6 +18,7 @@
             <a th:href="@{/companies/{id}/employees(id=${company.id})}" class="admin-tab">Employees</a>
             <a th:href="@{/companies/{id}/calendar(id=${company.id})}"  class="admin-tab active">Calendar</a>
             <a th:href="@{/admin/{id}/audit(id=${company.id})}"         class="admin-tab">Audit Log</a>
+            <a href="/logout" class="btn btn-outline btn-sm">Logout</a>
         </div>
     </div>
 </nav>
@@ -65,6 +66,7 @@
                             <th>Event</th>
                             <th>Budget</th>
                             <th>Status</th>
+                            <th>AI</th>
                             <th>Action</th>
                         </tr>
                     </thead>
@@ -96,6 +98,15 @@
                                 <span class="cal-status"
                                       th:classappend="'status-' + ${ev.status.toLowerCase().replace('_','-')}"
                                       th:text="${ev.status.replace('_',' ')}"></span>
+                            </td>
+
+                            <!-- AI Recommendation button -->
+                            <td>
+                                <a th:href="@{/companies/{cid}/recommendations/{eid}
+                                   (cid=${company.id},eid=${ev.id})}"
+                                   class="btn btn-primary btn-sm">
+                                   AI Rec →
+                                </a>
                             </td>
 
                             <!-- Inline status update form -->
