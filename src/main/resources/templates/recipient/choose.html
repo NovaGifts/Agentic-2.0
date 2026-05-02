@@ -112,6 +112,20 @@
                 </div>
             </div>
 
+            <!-- Star rating (optional) -->
+            <div class="recipient-card">
+                <div class="section-label" style="margin-bottom:6px;">How does this make you feel? (optional)</div>
+                <p style="font-size:14px; color:var(--muted); margin-bottom:12px;">Rate your gifting experience — it helps your People Ops team improve.</p>
+                <div class="star-rating" id="starRating">
+                    <span class="star" data-val="1">&#9733;</span>
+                    <span class="star" data-val="2">&#9733;</span>
+                    <span class="star" data-val="3">&#9733;</span>
+                    <span class="star" data-val="4">&#9733;</span>
+                    <span class="star" data-val="5">&#9733;</span>
+                </div>
+                <input type="hidden" name="recipientRating" id="recipientRatingInput"/>
+            </div>
+
             <!-- Submit -->
             <div class="recipient-card" style="text-align:center;">
                 <button type="submit" class="btn btn-primary btn-lg" style="min-width:220px;"
@@ -145,6 +159,28 @@
         }
         return true;
     }
+
+    document.querySelectorAll('.star').forEach(star => {
+        star.addEventListener('click', () => {
+            const val = parseInt(star.dataset.val);
+            document.getElementById('recipientRatingInput').value = val;
+            document.querySelectorAll('.star').forEach(s => {
+                s.classList.toggle('active', parseInt(s.dataset.val) <= val);
+            });
+        });
+        star.addEventListener('mouseover', () => {
+            const val = parseInt(star.dataset.val);
+            document.querySelectorAll('.star').forEach(s => {
+                s.classList.toggle('active', parseInt(s.dataset.val) <= val);
+            });
+        });
+        star.addEventListener('mouseout', () => {
+            const currentVal = parseInt(document.getElementById('recipientRatingInput').value) || 0;
+            document.querySelectorAll('.star').forEach(s => {
+                s.classList.toggle('active', parseInt(s.dataset.val) <= currentVal);
+            });
+        });
+    });
 </script>
 
 </body>

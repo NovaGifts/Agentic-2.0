@@ -68,14 +68,15 @@ public class RecipientController {
     public String saveChoice(@PathVariable String token,
                              @RequestParam(required = false) String selectedGiftId,
                              @RequestParam(required = false) String shippingAddress,
-                             @RequestParam(required = false) String thankYouNote) {
+                             @RequestParam(required = false) String thankYouNote,
+                             @RequestParam(required = false) Integer recipientRating) {
         if (selectedGiftId == null || selectedGiftId.isBlank()) {
             return "redirect:/gift/" + token;
         }
         boolean isDonation = "donation".equals(selectedGiftId);
         recipientService.saveSelection(token,
                 isDonation ? null : selectedGiftId,
-                shippingAddress, thankYouNote, isDonation);
+                shippingAddress, thankYouNote, isDonation, recipientRating);
 
         // After selection — send manager the approve/reject email
         eventRepo.findByRecipientToken(token).ifPresent(event -> {

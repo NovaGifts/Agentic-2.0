@@ -9,6 +9,6 @@ import java.util.Optional;
 @Repository
 public interface EmployeeRepository extends JpaRepository<Employee, Long> {
     List<Employee> findByCompanyId(Long companyId);
-    // Used during CSV upload to update existing employees instead of creating duplicates
     Optional<Employee> findByCompanyIdAndEmail(Long companyId, String email);
+    void deleteByCompanyId(Long companyId);
 }

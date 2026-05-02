@@ -44,7 +44,7 @@ public class RecipientService {
     // Saves the employee's choice and moves the event into the HR review queue
     public void saveSelection(String token, String selectedGiftId,
                                String shippingAddress, String thankYouNote,
-                               boolean donationChosen) {
+                               boolean donationChosen, Integer recipientRating) {
         eventRepo.findByRecipientToken(token).ifPresent(event -> {
             event.setStatus("SELECTION_PENDING");
             eventRepo.save(event);
@@ -54,6 +54,7 @@ public class RecipientService {
                 rec.setShippingAddress(shippingAddress);
                 rec.setThankYouNote(thankYouNote);
                 rec.setDonationChosen(donationChosen);
+                rec.setRecipientRating(recipientRating);
                 recRepo.save(rec);
             });
         });
