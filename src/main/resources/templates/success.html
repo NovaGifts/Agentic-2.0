@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>GiftNova — You're In!</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}"/>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+</head>
+<body class="form-page">
+
+<nav class="navbar">
+    <div class="container nav-inner">
+        <a href="/" class="logo">Gift<span>Nova</span></a>
+    </div>
+</nav>
+
+<section class="form-section">
+    <div class="form-card success-card">
+        <div class="success-icon">&#10003;</div>
+        <h1 th:text="${successMessage} ?: 'You\'re all set!'"></h1>
+        <p>Your company has been configured. The GiftNova team will reach out within 24 hours to schedule your onboarding call.</p>
+        <div class="success-next">
+            <p class="next-label">What happens next</p>
+            <ul>
+                <li>Onboarding call scheduled within 24 hours</li>
+                <li>Upload your employee CSV to start tracking milestones</li>
+                <li>First gift recommendations within 48 hours</li>
+            </ul>
+        </div>
+        <a href="/" class="btn btn-primary btn-lg">Back to Home</a>
+    </div>
+</section>
+
+</body>
+</html>

@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>GiftNova — Company Setup</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}"/>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+</head>
+<body class="form-page">
+
+<nav class="navbar">
+    <div class="container nav-inner">
+        <a href="/" class="logo">Gift<span>Nova</span></a>
+    </div>
+</nav>
+
+<section class="form-section">
+    <div class="form-card">
+        <div class="form-header">
+            <div class="section-label">Demo Setup</div>
+            <h1>Configure your company</h1>
+            <p>Set up your gifting policy in under 5 minutes.</p>
+        </div>
+
+        <form th:action="@{/setup}" th:object="${company}" method="post" class="setup-form" novalidate>
+
+            <!-- Company Info -->
+            <div class="form-section-title">Company Info</div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="name">Company Name</label>
+                    <input type="text" id="name" th:field="*{name}" placeholder="e.g. Acme Corp"/>
+                    <span class="field-error" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></span>
+                </div>
+                <div class="form-group">
+                    <label for="website">Website</label>
+                    <input type="text" id="website" th:field="*{website}" placeholder="e.g. acmecorp.com"/>
+                    <span class="field-error" th:if="${#fields.hasErrors('website')}" th:errors="*{website}"></span>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="industry">Industry</label>
+                    <select id="industry" th:field="*{industry}">
+                        <option value="">Select industry</option>
+                        <option value="Technology">Technology</option>
+                        <option value="Finance">Finance</option>
+                        <option value="Healthcare">Healthcare</option>
+                        <option value="Retail">Retail</option>
+                        <option value="Education">Education</option>
+                        <option value="Manufacturing">Manufacturing</option>
+                        <option value="Media">Media &amp; Entertainment</option>
+                        <option value="Consulting">Consulting</option>
+                        <option value="Other">Other</option>
+                    </select>
+                    <span class="field-error" th:if="${#fields.hasErrors('industry')}" th:errors="*{industry}"></span>
+                </div>
+                <div class="form-group">
+                    <label for="employeeCount">Company Size</label>
+                    <select id="employeeCount" th:field="*{employeeCount}">
+                        <option value="0">Select size</option>
+                        <option value="10">1–10 employees</option>
+                        <option value="50">11–50 employees</option>
+                        <option value="200">51–200 employees</option>
+                        <option value="500">201–500 employees</option>
+                        <option value="1000">501–1000 employees</option>
+                        <option value="5000">1000+ employees</option>
+                    </select>
+                    <span class="field-error" th:if="${#fields.hasErrors('employeeCount')}" th:errors="*{employeeCount}"></span>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="country">Country</label>
+                    <select id="country" th:field="*{country}">
+                        <option value="">Select country</option>
+                        <option value="US">United States</option>
+                        <option value="IN">India</option>
+                        <option value="GB">United Kingdom</option>
+                        <option value="CA">Canada</option>
+                        <option value="AU">Australia</option>
+                        <option value="SG">Singapore</option>
+                        <option value="DE">Germany</option>
+                        <option value="FR">France</option>
+                        <option value="Other">Other</option>
+                    </select>
+                    <span class="field-error" th:if="${#fields.hasErrors('country')}" th:errors="*{country}"></span>
+                </div>
+                <div class="form-group">
+                    <label for="currency">Default Currency</label>
+                    <select id="currency" th:field="*{currency}">
+                        <option value="">Select currency</option>
+                        <option value="USD">USD — US Dollar</option>
+                        <option value="EUR">EUR — Euro</option>
+                        <option value="GBP">GBP — British Pound</option>
+                        <option value="INR">INR — Indian Rupee</option>
+                        <option value="CAD">CAD — Canadian Dollar</option>
+                        <option value="AUD">AUD — Australian Dollar</option>
+                        <option value="SGD">SGD — Singapore Dollar</option>
+                    </select>
+                    <span class="field-error" th:if="${#fields.hasErrors('currency')}" th:errors="*{currency}"></span>
+                </div>
+            </div>
+
+            <!-- Admin Info -->
+            <div class="form-section-title">Admin Info</div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="adminName">Admin Name</label>
+                    <input type="text" id="adminName" th:field="*{adminName}" placeholder="e.g. Jane Smith"/>
+                    <span class="field-error" th:if="${#fields.hasErrors('adminName')}" th:errors="*{adminName}"></span>
+                </div>
+                <div class="form-group">
+                    <label for="adminEmail">Admin Email</label>
+                    <input type="email" id="adminEmail" th:field="*{adminEmail}" placeholder="e.g. jane@acmecorp.com"/>
+                    <span class="field-error" th:if="${#fields.hasErrors('adminEmail')}" th:errors="*{adminEmail}"></span>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="timezone">Timezone</label>
+                <select id="timezone" th:field="*{timezone}">
+                    <option value="">Select timezone</option>
+                    <option value="America/New_York">Eastern Time (ET) — UTC-5/4</option>
+                    <option value="America/Chicago">Central Time (CT) — UTC-6/5</option>
+                    <option value="America/Denver">Mountain Time (MT) — UTC-7/6</option>
+                    <option value="America/Los_Angeles">Pacific Time (PT) — UTC-8/7</option>
+                    <option value="Europe/London">London (GMT) — UTC+0/1</option>
+                    <option value="Europe/Paris">Central Europe (CET) — UTC+1/2</option>
+                    <option value="Asia/Kolkata">India (IST) — UTC+5:30</option>
+                    <option value="Asia/Singapore">Singapore (SGT) — UTC+8</option>
+                    <option value="Australia/Sydney">Sydney (AEST) — UTC+10/11</option>
+                </select>
+                <span class="field-error" th:if="${#fields.hasErrors('timezone')}" th:errors="*{timezone}"></span>
+            </div>
+
+            <!-- Budget Settings -->
+            <div class="form-section-title">Budget Settings</div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="monthlyBudget">Monthly Gifting Budget</label>
+                    <div class="input-prefix">
+                        <span class="prefix">$</span>
+                        <input type="number" id="monthlyBudget" th:field="*{monthlyBudget}"
+                               placeholder="e.g. 2000" min="0.01" step="0.01"/>
+                    </div>
+                    <span class="field-error" th:if="${#fields.hasErrors('monthlyBudget')}" th:errors="*{monthlyBudget}"></span>
+                </div>
+                <div class="form-group">
+                    <label for="approvalThreshold">Approval Threshold</label>
+                    <div class="input-prefix">
+                        <span class="prefix">$</span>
+                        <input type="number" id="approvalThreshold" th:field="*{approvalThreshold}"
+                               placeholder="e.g. 100" min="0.01" step="0.01"/>
+                    </div>
+                    <p class="field-hint">Gifts above this need manager approval.</p>
+                    <span class="field-error" th:if="${#fields.hasErrors('approvalThreshold')}" th:errors="*{approvalThreshold}"></span>
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-full btn-lg">
+                Launch My Pilot &rarr;
+            </button>
+
+        </form>
+    </div>
+</section>
+
+</body>
+</html>

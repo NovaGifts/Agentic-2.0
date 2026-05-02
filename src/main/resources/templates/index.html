@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>GiftNova — Employee Appreciation, Automated</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}"/>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="navbar">
+    <div class="container nav-inner">
+        <a href="/" class="logo">Gift<span>Nova</span></a>
+        <div class="nav-links">
+            <a href="#pain">Why GiftNova</a>
+            <a href="#how">How It Works</a>
+            <a href="/setup" class="btn btn-primary">Book a Pilot</a>
+        </div>
+    </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+    <div class="container hero-inner">
+        <div class="hero-badge">Built for People Ops Teams</div>
+        <h1>Employee appreciation,<br/>on autopilot.</h1>
+        <p class="hero-sub">
+            GiftNova helps People Ops teams automate employee appreciation decisions
+            under company policy and budget — no spreadsheets, no dropped balls.
+        </p>
+        <div class="hero-cta">
+            <a href="/setup" class="btn btn-primary btn-lg">Book a Pilot</a>
+            <a href="/setup" class="btn btn-outline btn-lg">See Demo Setup</a>
+        </div>
+        <div class="hero-social-proof">
+            <span>Trusted by HR teams at fast-growing companies</span>
+        </div>
+    </div>
+</section>
+
+<!-- PAIN POINTS -->
+<section id="pain" class="pain">
+    <div class="container">
+        <div class="section-label">The Problem</div>
+        <h2>Manual gifting is costing you<br/>more than you think</h2>
+        <div class="pain-grid">
+            <div class="pain-card">
+                <div class="pain-icon">📅</div>
+                <h3>Missed moments</h3>
+                <p>Birthdays, work anniversaries, and onboarding gifts fall through the cracks when HR is juggling 50 other priorities.</p>
+            </div>
+            <div class="pain-card">
+                <div class="pain-icon">📊</div>
+                <h3>Messy tracking</h3>
+                <p>Gift decisions spread across emails, Slack threads, and spreadsheets. No single source of truth, no audit trail.</p>
+            </div>
+            <div class="pain-card">
+                <div class="pain-icon">💸</div>
+                <h3>Unclear budgets</h3>
+                <p>Who approves a &#36;120 gift vs a &#36;30 gift? Budget rules live in someone's head — until someone overspends.</p>
+            </div>
+            <div class="pain-card">
+                <div class="pain-icon">🎁</div>
+                <h3>Generic gifts</h3>
+                <p>When there's no system, employees get the same Amazon gift card every year. That's not appreciation — that's a checkbox.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section id="how" class="how">
+    <div class="container">
+        <div class="section-label">How It Works</div>
+        <h2>Set it up once. Never miss again.</h2>
+        <div class="steps">
+            <div class="step">
+                <div class="step-number">01</div>
+                <div class="step-body">
+                    <h3>Configure your company</h3>
+                    <p>Set your budget, approval thresholds, and gifting policies. Takes 5 minutes.</p>
+                </div>
+            </div>
+            <div class="step">
+                <div class="step-number">02</div>
+                <div class="step-body">
+                    <h3>Upload your employee roster</h3>
+                    <p>Import via CSV. GiftNova tracks birthdays, hire dates, and milestones automatically.</p>
+                </div>
+            </div>
+            <div class="step">
+                <div class="step-number">03</div>
+                <div class="step-body">
+                    <h3>Approve with one click</h3>
+                    <p>GiftNova surfaces the right gift, at the right time, within your budget — you just approve.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CTA SECTION -->
+<section class="cta-section">
+    <div class="container cta-inner">
+        <h2>Ready to make every employee feel seen?</h2>
+        <p>Start your pilot in minutes. No credit card required.</p>
+        <div class="cta-buttons">
+            <a href="/setup" class="btn btn-white btn-lg">Book a Pilot</a>
+            <a href="/setup" class="btn btn-outline-white btn-lg">Upload Employee CSV</a>
+        </div>
+    </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="footer">
+    <div class="container footer-inner">
+        <span class="logo">Gift<span>Nova</span></span>
+        <span class="footer-copy">&copy; 2026 GiftNova. Built for People Ops teams.</span>
+    </div>
+</footer>
+
+</body>
+</html>
