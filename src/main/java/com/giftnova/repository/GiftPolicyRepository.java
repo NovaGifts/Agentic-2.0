@@ -9,4 +9,7 @@ import java.util.List;
 public interface GiftPolicyRepository extends JpaRepository<GiftPolicy, Long> {
     List<GiftPolicy> findByCompanyIdOrderByEventType(Long companyId);
     long countByCompanyId(Long companyId);
+    // Used by EventGeneratorService to get the budget for a specific event type
+    java.util.Optional<com.giftnova.model.GiftPolicy> findByCompanyIdAndEventType(
+            Long companyId, com.giftnova.model.EventType eventType);
 }

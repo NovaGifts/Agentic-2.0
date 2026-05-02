@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>GiftNova — Upload Employees</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}"/>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+</head>
+<body class="admin-page">
+
+<nav class="navbar">
+    <div class="container nav-inner">
+        <a href="/" class="logo">Gift<span>Nova</span></a>
+        <div class="nav-links">
+            <span class="admin-company" th:text="${company.name}"></span>
+            <a th:href="@{/admin/{id}/policies(id=${company.id})}"  class="admin-tab">Policy Rules</a>
+            <a th:href="@{/companies/{id}/employees(id=${company.id})}" class="admin-tab active">Employees</a>
+            <a th:href="@{/companies/{id}/events(id=${company.id})}"    class="admin-tab">Upcoming Events</a>
+            <a th:href="@{/admin/{id}/audit(id=${company.id})}"     class="admin-tab">Audit Log</a>
+        </div>
+    </div>
+</nav>
+
+<div class="admin-layout container">
+
+    <div class="admin-header">
+        <div>
+            <div class="section-label">Phase 3</div>
+            <h1>Upload Employees</h1>
+            <p class="admin-sub">Import your team via CSV — birthdays and anniversaries are tracked automatically.</p>
+        </div>
+        <a th:href="@{/companies/{id}/events(id=${company.id})}" class="btn btn-primary">
+            View Upcoming Events →
+        </a>
+    </div>
+
+    <!-- Upload errors (file missing or parse exception) -->
+    <div class="alert-error" th:if="${uploadError}" th:text="${uploadError}"></div>
+
+    <!-- CSV upload result summary -->
+    <div th:if="${uploadResult}">
+        <div class="alert-success" th:if="${uploadResult.successCount > 0}">
+            ✓ <span th:text="${uploadResult.successCount}"></span> employee(s) uploaded successfully.
+        </div>
+        <div class="error-list" th:if="${uploadResult.hasErrors()}">
+            <p class="error-list-title">⚠ Some rows had errors and were skipped:</p>
+            <ul>
+                <li th:each="err : ${uploadResult.errors}" th:text="${err}"></li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Upload form -->
+    <div class="admin-card">
+        <div class="admin-card-header">
+            <h2>Upload CSV</h2>
+            <p>Required columns: <code>name, email</code> &nbsp;|&nbsp;
+               Optional: <code>department, manager, start_date, birthday, country</code></p>
+        </div>
+
+        <!-- Sample format hint -->
+        <div class="csv-sample">
+            <p class="csv-sample-label">Expected format (dates: yyyy-MM-dd)</p>
+            <pre>name,email,department,manager,start_date,birthday,country
+Priya Shah,priya@acme.com,Engineering,Ravi Kumar,2023-05-15,1995-05-18,India
+Daniel Kim,daniel@acme.com,Sales,Jane Smith,2022-03-01,1990-05-22,US</pre>
+        </div>
+
+        <form th:action="@{/companies/{id}/employees/upload(id=${company.id})}"
+              method="post" enctype="multipart/form-data" class="upload-form">
+            <div class="file-input-wrap">
+                <input type="file" id="file" name="file" accept=".csv" required/>
+            </div>
+            <button type="submit" class="btn btn-primary btn-lg">Upload CSV</button>
+        </form>
+    </div>
+
+    <!-- Employee list (shows after upload) -->
+    <div class="admin-card" th:if="${!#lists.isEmpty(employees)}">
+        <div class="admin-card-header">
+            <h2>Employees
+                <span class="count-badge" th:text="${#lists.size(employees)}"></span>
+            </h2>
+        </div>
+        <div class="table-wrap">
+            <table class="policy-table">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Department</th>
+                        <th>Manager</th>
+                        <th>Start Date</th>
+                        <th>Birthday</th>
+                        <th>Country</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="emp : ${employees}">
+                        <td class="event-label" th:text="${emp.name}"></td>
+                        <td th:text="${emp.email}"></td>
+                        <td th:text="${emp.department ?: '—'}"></td>
+                        <td th:text="${emp.manager ?: '—'}"></td>
+                        <td th:text="${emp.startDate ?: '—'}"></td>
+                        <td th:text="${emp.birthday ?: '—'}"></td>
+                        <td th:text="${emp.country ?: '—'}"></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+</body>
+</html>

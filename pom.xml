@@ -47,6 +47,12 @@
             <artifactId>lombok</artifactId>
             <optional>true</optional>
         </dependency>
+        <!-- CSV parsing for employee upload -->
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-csv</artifactId>
+            <version>1.10.0</version>
+        </dependency>
     </dependencies>
 
     <build>
