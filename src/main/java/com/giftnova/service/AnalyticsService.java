@@ -45,7 +45,10 @@ public class AnalyticsService {
         Set<String> SELECTED_STATUSES    = Set.of("SELECTION_PENDING", "APPROVED", "SENT");
         Set<String> LINK_SENT_STATUSES   = Set.of("LINK_SENT", "SELECTION_PENDING", "APPROVED", "SENT", "REJECTED");
 
-        long totalEvents    = events.size();
+        java.time.YearMonth thisMonth = java.time.YearMonth.now();
+        long totalEvents = events.stream()
+                .filter(e -> java.time.YearMonth.from(e.getEventDate()).equals(thisMonth))
+                .count();
         long giftsApproved  = events.stream().filter(e -> APPROVED_STATUSES.contains(e.getStatus())).count();
 
         BigDecimal budgetUsed = recs.stream()

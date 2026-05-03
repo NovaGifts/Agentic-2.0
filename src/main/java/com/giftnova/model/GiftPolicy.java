@@ -34,11 +34,6 @@ public class GiftPolicy {
     @Column(name = "approval_required", nullable = false)
     private boolean approvalRequired;
 
-    // If set, approval is only needed when the gift cost exceeds this amount.
-    // If null and approvalRequired=true, approval is always needed.
-    @Column(name = "approval_threshold", precision = 10, scale = 2)
-    private BigDecimal approvalThreshold;
-
     // If true, GiftNova sends the gift automatically without manual HR action
     @Column(name = "auto_send", nullable = false)
     private boolean autoSend;
@@ -65,8 +60,6 @@ public class GiftPolicy {
     public void setBudgetLimit(BigDecimal budgetLimit) { this.budgetLimit = budgetLimit; }
     public boolean isApprovalRequired() { return approvalRequired; }
     public void setApprovalRequired(boolean approvalRequired) { this.approvalRequired = approvalRequired; }
-    public BigDecimal getApprovalThreshold() { return approvalThreshold; }
-    public void setApprovalThreshold(BigDecimal approvalThreshold) { this.approvalThreshold = approvalThreshold; }
     public boolean isAutoSend() { return autoSend; }
     public void setAutoSend(boolean autoSend) { this.autoSend = autoSend; }
     public LocalDateTime getCreatedAt() { return createdAt; }

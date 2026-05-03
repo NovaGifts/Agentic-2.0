@@ -14,6 +14,8 @@ public class PolicyForm {
     // One entry per event type (Birthday, Work Anniversary, Onboarding, Manager Appreciation)
     private List<GiftPolicy> policies = new ArrayList<>();
 
+    private java.math.BigDecimal monthlyBudget;
+
     // Comma-separated gift categories that are blocked company-wide (e.g. "Alcohol, Tobacco")
     private String restrictedCategories;
 
@@ -23,6 +25,8 @@ public class PolicyForm {
     // Comma-separated office locations eligible for gifting; empty = all locations
     private String allowedLocations;
 
+    public java.math.BigDecimal getMonthlyBudget() { return monthlyBudget; }
+    public void setMonthlyBudget(java.math.BigDecimal monthlyBudget) { this.monthlyBudget = monthlyBudget; }
     public List<GiftPolicy> getPolicies() { return policies; }
     public void setPolicies(List<GiftPolicy> policies) { this.policies = policies; }
     public String getRestrictedCategories() { return restrictedCategories; }

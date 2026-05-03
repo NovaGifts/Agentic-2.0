@@ -27,6 +27,10 @@ public class Employee {
 
     private String department;
     private String manager;
+
+    @Column(name = "manager_email")
+    private String managerEmail;
+
     private String country;
 
     // Date the employee joined — used to calculate work anniversaries
@@ -53,6 +57,8 @@ public class Employee {
     public void setDepartment(String department) { this.department = department; }
     public String getManager() { return manager; }
     public void setManager(String manager) { this.manager = manager; }
+    public String getManagerEmail() { return managerEmail; }
+    public void setManagerEmail(String managerEmail) { this.managerEmail = managerEmail; }
     public String getCountry() { return country; }
     public void setCountry(String country) { this.country = country; }
     public LocalDate getStartDate() { return startDate; }

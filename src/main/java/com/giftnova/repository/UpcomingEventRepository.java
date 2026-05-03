@@ -3,6 +3,7 @@ package com.giftnova.repository;
 import com.giftnova.model.UpcomingEvent;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -12,4 +13,5 @@ public interface UpcomingEventRepository extends JpaRepository<UpcomingEvent, Lo
     void deleteByCompanyId(Long companyId);
     Optional<UpcomingEvent> findByRecipientToken(String recipientToken);
     Optional<UpcomingEvent> findByManagerToken(String managerToken);
+    List<UpcomingEvent> findByEventDateAndStatus(LocalDate eventDate, String status);
 }

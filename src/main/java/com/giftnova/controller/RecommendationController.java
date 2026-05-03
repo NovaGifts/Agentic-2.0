@@ -105,13 +105,18 @@ public class RecommendationController {
             employeeRepo.findById(event.getEmployeeId()).ifPresent(emp ->
                 emailService.sendRecommendationToEmployee(
                     emp.getEmail(), emp.getName(), company.getName(),
-                    event.getEventType().getLabel(), rec.getMessageDraft(), gifts, recipientToken));
+                    event.getEventType().getLabel(), rec.getMessageDraft(), recipientToken));
 
             // FYI to manager — approve/reject email comes after employee picks
-            emailService.sendManagerFyi(
-                company.getAdminEmail(), company.getAdminName(),
-                event.getEmployeeName(), company.getName(),
-                event.getEventType().getLabel());
+            com.giftnova.model.Employee emp = employeeRepo.findById(event.getEmployeeId()).orElse(null);
+            String managerEmail = emailService.resolveManagerEmail(emp, company);
+            String managerName  = emailService.resolveManagerName(emp, company);
+            emailService.sendManagerFyi(managerEmail, managerName,
+                event.getEmployeeName(), company.getName(), event.getEventType().getLabel());
+            if (!managerEmail.equals(company.getAdminEmail())) {
+                emailService.sendHrFyi(company.getAdminEmail(), company.getAdminName(),
+                    event.getEmployeeName(), event.getEventType().getLabel());
+            }
 
             redirectAttrs.addFlashAttribute("toast",
                 emailService.isConfigured()

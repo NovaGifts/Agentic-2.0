@@ -71,8 +71,6 @@
                         <tr>
                             <th>Event Type</th>
                             <th>Budget ($)</th>
-                            <th>Approval Required</th>
-                            <th>Approval Threshold ($)</th>
                             <th>Auto-send</th>
                         </tr>
                     </thead>
@@ -89,19 +87,6 @@
                                 <input type="number" class="table-input"
                                        th:field="*{policies[__${i.index}__].budgetLimit}"
                                        min="1" step="1"/>
-                            </td>
-
-                            <td class="center">
-                                <input type="checkbox" class="toggle"
-                                       th:field="*{policies[__${i.index}__].approvalRequired}"/>
-                            </td>
-
-                            <td>
-                                <input type="number" class="table-input"
-                                       th:field="*{policies[__${i.index}__].approvalThreshold}"
-                                       min="0" step="1"
-                                       placeholder="Always"/>
-                                <span class="table-hint">blank = always</span>
                             </td>
 
                             <td class="center">
@@ -147,25 +132,10 @@
                     <label>Max Monthly Budget</label>
                     <div class="input-prefix">
                         <span class="prefix">$</span>
-                        <input type="text"
-                               th:value="${company.monthlyBudget}"
-                               disabled class="disabled-input"/>
+                        <input type="number" th:field="*{monthlyBudget}" min="0.01" step="0.01"/>
                     </div>
-                    <p class="field-hint">Set during company setup.
-                        <a th:href="@{/setup}">Update →</a></p>
                 </div>
 
-                <div class="form-group">
-                    <label>Global Approval Threshold</label>
-                    <div class="input-prefix">
-                        <span class="prefix">$</span>
-                        <input type="text"
-                               th:value="${company.approvalThreshold}"
-                               disabled class="disabled-input"/>
-                    </div>
-                    <p class="field-hint">Set during company setup.
-                        <a th:href="@{/setup}">Update →</a></p>
-                </div>
             </div>
         </div>
 

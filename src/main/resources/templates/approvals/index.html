@@ -51,8 +51,8 @@
         </div>
         <!-- Live stats -->
         <div class="queue-stats">
-            <span class="q-stat q-stat-selection" th:if="${selectionCount > 0}" th:text="${selectionCount} + ' No Response Yet'"></span>
-            <span class="q-stat q-stat-sent"      th:if="${approvedCount > 0}"  th:text="${approvedCount}  + ' Accepted'"></span>
+            <span class="q-stat q-stat-selection" th:if="${selectionCount > 0}" th:text="${selectionCount} + ' Not Responded Yet'"></span>
+            <span class="q-stat q-stat-sent"      th:if="${approvedCount > 0}"  th:text="${approvedCount}  + ' Approved'"></span>
             <span class="q-stat q-stat-rejected"  th:if="${rejectedCount > 0}"  th:text="${rejectedCount}  + ' Rejected'"></span>
         </div>
     </div>
@@ -105,8 +105,8 @@
                         <th>Event</th>
                         <th>Gift Selected</th>
                         <th>Budget</th>
-                        <th>Status</th>
-                        <th>Actions</th>
+                        <th>Employee Status</th>
+                        <th>Manager Status</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -139,16 +139,24 @@
 
                         <!-- Budget -->
                         <td class="cal-budget"
-                            th:text="'$' + ${item.recommendation.recommendedBudget}"></td>
+                            th:text="${item.policyBudget != null} ? ('$' + ${item.policyBudget}) : '—'"></td>
 
-                        <!-- Manager Decision Status -->
+                        <!-- Employee Status -->
                         <td>
-                            <span th:if="${item.event.status == 'SELECTION_PENDING'}"
-                                  class="cal-status status-link-sent">No Response Yet</span>
+                            <span th:if="${item.recommendation.selectedGiftId != null}"
+                                  class="cal-status status-approved">Selected</span>
+                            <span th:unless="${item.recommendation.selectedGiftId != null}"
+                                  class="cal-status status-needs-review">Not Selected</span>
+                        </td>
+
+                        <!-- Manager Status -->
+                        <td>
                             <span th:if="${item.event.status == 'APPROVED'}"
-                                  class="cal-status status-approved">✓ Accepted</span>
+                                  class="cal-status status-approved">&#10003; Approved</span>
                             <span th:if="${item.event.status == 'REJECTED'}"
-                                  class="cal-status status-rejected">✕ Rejected</span>
+                                  class="cal-status status-rejected">&#10005; Rejected</span>
+                            <span th:if="${item.event.status != 'APPROVED' and item.event.status != 'REJECTED'}"
+                                  class="cal-status status-link-sent">Pending</span>
                         </td>
 
                     </tr>

@@ -74,15 +74,15 @@
         <div class="admin-card-header">
             <h2>Upload CSV</h2>
             <p>Required columns: <code>name, email</code> &nbsp;|&nbsp;
-               Optional: <code>department, manager, start_date, birthday, country</code></p>
+               Optional: <code>department, manager, manager_email, start_date, birthday, country</code></p>
         </div>
 
         <!-- Sample format hint -->
         <div class="csv-sample">
             <p class="csv-sample-label">Expected format (dates: yyyy-MM-dd)</p>
-            <pre>name,email,department,manager,start_date,birthday,country
-Priya Shah,priya@acme.com,Engineering,Ravi Kumar,2023-05-15,1995-05-18,India
-Daniel Kim,daniel@acme.com,Sales,Jane Smith,2022-03-01,1990-05-22,US</pre>
+            <pre>name,email,department,manager,manager_email,start_date,birthday,country
+Priya Shah,priya@acme.com,Engineering,Ravi Kumar,ravi@acme.com,2023-05-15,1995-05-18,India
+Daniel Kim,daniel@acme.com,Sales,Jane Smith,jane@acme.com,2022-03-01,1990-05-22,US</pre>
         </div>
 
         <form th:action="@{/companies/{id}/employees/upload(id=${company.id})}"

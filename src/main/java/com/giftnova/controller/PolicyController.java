@@ -52,6 +52,7 @@ public class PolicyController {
         form.setRestrictedCategories(company.getRestrictedCategories());
         form.setAllowedDepartments(company.getAllowedDepartments());
         form.setAllowedLocations(company.getAllowedLocations());
+        form.setMonthlyBudget(company.getMonthlyBudget());
 
         model.addAttribute("company", company);
         model.addAttribute("policyForm", form);
@@ -66,6 +67,8 @@ public class PolicyController {
         try {
             Company company = companyService.findById(companyId);
             policyService.updatePolicies(companyId, policyForm, company.getAdminEmail());
+            if (policyForm.getMonthlyBudget() != null) company.setMonthlyBudget(policyForm.getMonthlyBudget());
+            companyService.save(company);
         } catch (Exception e) {
             redirectAttrs.addFlashAttribute("errorMessage", "Could not save policies: " + e.getMessage());
             return "redirect:/admin/" + companyId + "/policies";
