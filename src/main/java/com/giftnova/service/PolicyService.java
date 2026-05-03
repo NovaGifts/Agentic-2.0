@@ -38,10 +38,10 @@ public class PolicyService {
         if (policyRepo.countByCompanyId(companyId) > 0) return;
 
         List<GiftPolicy> defaults = new ArrayList<>();
-        defaults.add(build(companyId, EventType.BIRTHDAY,             new BigDecimal("40"),  false, null,                 true));
-        defaults.add(build(companyId, EventType.WORK_ANNIVERSARY,     new BigDecimal("75"),  true,  new BigDecimal("75"), false));
-        defaults.add(build(companyId, EventType.ONBOARDING,           new BigDecimal("100"), true,  null,                 false));
-        defaults.add(build(companyId, EventType.MANAGER_APPRECIATION, new BigDecimal("50"),  true,  null,                 false));
+        defaults.add(build(companyId, EventType.BIRTHDAY,             new BigDecimal("40"),  true));
+        defaults.add(build(companyId, EventType.WORK_ANNIVERSARY,     new BigDecimal("75"),  false));
+        defaults.add(build(companyId, EventType.ONBOARDING,           new BigDecimal("100"), false));
+        defaults.add(build(companyId, EventType.MANAGER_APPRECIATION, new BigDecimal("50"),  false));
         policyRepo.saveAll(defaults);
     }
 
@@ -69,16 +69,10 @@ public class PolicyService {
             logIfChanged(companyId, existing.getEventType().getLabel(),
                     "Budget Limit", str(existing.getBudgetLimit()), str(update.getBudgetLimit()), changedBy);
             logIfChanged(companyId, existing.getEventType().getLabel(),
-                    "Approval Required", str(existing.isApprovalRequired()), str(update.isApprovalRequired()), changedBy);
-            logIfChanged(companyId, existing.getEventType().getLabel(),
-                    "Approval Threshold", str(existing.getApprovalThreshold()), str(update.getApprovalThreshold()), changedBy);
-            logIfChanged(companyId, existing.getEventType().getLabel(),
                     "Auto Send", str(existing.isAutoSend()), str(update.isAutoSend()), changedBy);
 
             existing.setBudgetLimit(update.getBudgetLimit());
-            existing.setApprovalRequired(update.isApprovalRequired());
-            // Clear threshold when approval is turned off
-            existing.setApprovalThreshold(update.isApprovalRequired() ? update.getApprovalThreshold() : null);
+            existing.setApprovalRequired(true);
             existing.setAutoSend(update.isAutoSend());
             policyRepo.save(existing);
         }
@@ -107,14 +101,12 @@ public class PolicyService {
     }
 
     // Helper to build a GiftPolicy with all required fields set
-    private GiftPolicy build(Long companyId, EventType type, BigDecimal budget,
-                              boolean approvalRequired, BigDecimal threshold, boolean autoSend) {
+    private GiftPolicy build(Long companyId, EventType type, BigDecimal budget, boolean autoSend) {
         GiftPolicy p = new GiftPolicy();
         p.setCompanyId(companyId);
         p.setEventType(type);
         p.setBudgetLimit(budget);
-        p.setApprovalRequired(approvalRequired);
-        p.setApprovalThreshold(threshold);
+        p.setApprovalRequired(true);
         p.setAutoSend(autoSend);
         return p;
     }

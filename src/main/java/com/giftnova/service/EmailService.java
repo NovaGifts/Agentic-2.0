@@ -4,7 +4,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
+import jakarta.mail.internet.MimeMessage;
 
 /**
  * Sends the recipient gift-link email to the employee.
@@ -52,17 +54,8 @@ public class EmailService {
     public void sendRecommendationToEmployee(String toEmail, String employeeName,
                                               String companyName, String eventType,
                                               String messageDraft,
-                                              java.util.List<java.util.Map<String, Object>> gifts,
                                               String recipientToken) {
         if (!isConfigured()) return;
-
-        StringBuilder giftList = new StringBuilder();
-        int i = 1;
-        for (java.util.Map<String, Object> gift : gifts) {
-            giftList.append(i++).append(". ")
-                    .append(gift.get("name")).append(" — $").append(gift.get("price"))
-                    .append("\n");
-        }
 
         String selectUrl = baseUrl + "/gift/" + recipientToken;
 
@@ -73,8 +66,8 @@ public class EmailService {
         msg.setText(
             "Hi " + employeeName + ",\n\n" +
             messageDraft + "\n\n" +
-            "Here are your gift options:\n" + giftList + "\n" +
-            "👉 Choose your gift here (no login needed):\n" + selectUrl + "\n\n" +
+            "We have a surprise gift waiting for you! Click below to reveal and choose your gift:\n" +
+            selectUrl + "\n\n" +
             "This link is personal to you — please don't share it.\n\n" +
             "– " + companyName
         );
@@ -100,39 +93,68 @@ public class EmailService {
         mailSender.send(msg);
     }
 
-    public void sendApprovalRequestToManager(String managerEmail, String managerName,
-                                              String employeeName, String companyName,
-                                              String eventType, String messageDraft,
-                                              java.util.List<java.util.Map<String, Object>> gifts,
-                                              java.math.BigDecimal budget,
-                                              String managerToken) {
+    public void sendHrFyi(String hrEmail, String hrName,
+                           String employeeName, String eventType) {
         if (!isConfigured()) return;
 
-        StringBuilder giftList = new StringBuilder();
-        for (java.util.Map<String, Object> gift : gifts) {
-            giftList.append("• ").append(gift.get("name"))
-                    .append(" — $").append(gift.get("price")).append("\n");
-        }
+        SimpleMailMessage msg = new SimpleMailMessage();
+        msg.setFrom(fromAddress);
+        msg.setTo(hrEmail);
+        msg.setSubject("[GiftNova] Gift link sent to " + employeeName);
+        msg.setText(
+            "Hi " + hrName + ",\n\n" +
+            "A gift selection link has been sent to " + employeeName +
+            " for their " + eventType + ".\n\n" +
+            "– GiftNova"
+        );
+        mailSender.send(msg);
+    }
+
+    public void sendApprovalRequestToManager(String managerEmail, String managerName,
+                                              String employeeName, String companyName,
+                                              String eventType, String selectedGiftName,
+                                              String managerToken) {
+        if (!isConfigured()) return;
 
         String approveUrl = baseUrl + "/manager/" + managerToken + "/approve";
         String rejectUrl  = baseUrl + "/manager/" + managerToken + "/reject";
 
-        SimpleMailMessage msg = new SimpleMailMessage();
-        msg.setFrom(fromAddress);
-        msg.setTo(managerEmail);
-        msg.setSubject("[GiftNova] Approval needed — " + employeeName + "'s " + eventType);
-        msg.setText(
-            "Hi " + managerName + ",\n\n" +
-            "A gift recommendation for " + employeeName + " requires your approval.\n\n" +
-            "Event: " + eventType + "\n" +
-            "Budget: $" + budget + "\n\n" +
-            "Recommended gifts:\n" + giftList + "\n" +
-            "Message draft:\n" + messageDraft + "\n\n" +
-            "✅ APPROVE:  " + approveUrl + "\n" +
-            "❌ REJECT:   " + rejectUrl + "\n\n" +
-            "Just click the link — no login required.\n\n" +
-            "– GiftNova"
-        );
-        mailSender.send(msg);
+        try {
+            MimeMessage mime = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(mime, false, "UTF-8");
+            helper.setFrom(fromAddress);
+            helper.setTo(managerEmail);
+            helper.setSubject("[GiftNova] Approval needed — " + employeeName + "'s " + eventType);
+            helper.setText(
+                "<div style='font-family:Arial,sans-serif;font-size:15px;color:#111;max-width:480px;margin:0 auto;padding:24px;'>" +
+                "<p>Hi " + managerName + ",</p>" +
+                "<p><strong>" + employeeName + "</strong> has selected their <strong>" + eventType + "</strong> gift:</p>" +
+                "<p style='font-size:18px;font-weight:bold;margin:20px 0;'>\"" + selectedGiftName + "\"</p>" +
+                "<p>Please take action:</p>" +
+                "<div style='margin:28px 0;display:flex;gap:16px;'>" +
+                "<a href='" + approveUrl + "' style='display:inline-block;padding:12px 28px;background:#16a34a;color:#fff;text-decoration:none;border-radius:6px;font-weight:bold;font-size:15px;margin-right:12px;'>&#10003; Approve</a>" +
+                "<a href='" + rejectUrl  + "' style='display:inline-block;padding:12px 28px;background:#dc2626;color:#fff;text-decoration:none;border-radius:6px;font-weight:bold;font-size:15px;'>&#10005; Reject</a>" +
+                "</div>" +
+                "<p style='color:#666;font-size:13px;'>– GiftNova</p>" +
+                "</div>",
+                true
+            );
+            mailSender.send(mime);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to send approval email: " + e.getMessage(), e);
+        }
+    }
+
+    public String resolveManagerEmail(com.giftnova.model.Employee emp, com.giftnova.model.Company company) {
+        if (emp != null && emp.getManagerEmail() != null && !emp.getManagerEmail().isBlank())
+            return emp.getManagerEmail();
+        return company.getAdminEmail();
+    }
+
+    public String resolveManagerName(com.giftnova.model.Employee emp, com.giftnova.model.Company company) {
+        if (emp != null && emp.getManagerEmail() != null && !emp.getManagerEmail().isBlank()
+                && emp.getManager() != null && !emp.getManager().isBlank())
+            return emp.getManager();
+        return company.getAdminName();
     }
 }

@@ -1,6 +1,7 @@
 package com.giftnova.controller;
 
 import com.giftnova.model.*;
+import com.giftnova.repository.EmployeeRepository;
 import com.giftnova.repository.GiftRecommendationRepository;
 import com.giftnova.repository.UpcomingEventRepository;
 import com.giftnova.service.*;
@@ -25,19 +26,22 @@ public class RecipientController {
     private final UpcomingEventRepository      eventRepo;
     private final EmailService                 emailService;
     private final GiftCatalogService           catalogService;
+    private final EmployeeRepository           employeeRepo;
 
     public RecipientController(RecipientService recipientService,
                                 CompanyService companyService,
                                 GiftRecommendationRepository recRepo,
                                 UpcomingEventRepository eventRepo,
                                 EmailService emailService,
-                                GiftCatalogService catalogService) {
+                                GiftCatalogService catalogService,
+                                EmployeeRepository employeeRepo) {
         this.recipientService = recipientService;
         this.companyService   = companyService;
         this.recRepo          = recRepo;
         this.eventRepo        = eventRepo;
         this.emailService     = emailService;
         this.catalogService   = catalogService;
+        this.employeeRepo     = employeeRepo;
     }
 
     @GetMapping("/{token}")
@@ -81,20 +85,17 @@ public class RecipientController {
         // After selection — send manager the approve/reject email
         eventRepo.findByRecipientToken(token).ifPresent(event -> {
             Company company = companyService.findById(event.getCompanyId());
-            recRepo.findByEventId(event.getId()).ifPresent(rec -> {
-                // Resolve gift details for the email
-                List<Map<String, Object>> gifts = new ArrayList<>();
-                String cleaned = rec.getRecommendedGiftIds() == null ? "" :
-                        rec.getRecommendedGiftIds().replaceAll("[\\[\\]\"\\s]", "");
-                for (String id : cleaned.split(",")) {
-                    if (!id.isBlank()) catalogService.findById(id.trim()).ifPresent(gifts::add);
-                }
-                emailService.sendApprovalRequestToManager(
-                        company.getAdminEmail(), company.getAdminName(),
-                        event.getEmployeeName(), company.getName(),
-                        event.getEventType().getLabel(), rec.getMessageDraft(),
-                        gifts, rec.getRecommendedBudget(), event.getManagerToken());
-            });
+            String selectedGiftName = isDonation ? "Charitable donation" :
+                catalogService.findById(selectedGiftId)
+                    .map(g -> (String) g.get("name")).orElse("Selected gift");
+            Employee emp = employeeRepo.findById(event.getEmployeeId()).orElse(null);
+            String managerEmail = emailService.resolveManagerEmail(emp, company);
+            String managerName  = emailService.resolveManagerName(emp, company);
+            emailService.sendApprovalRequestToManager(
+                    managerEmail, managerName,
+                    event.getEmployeeName(), company.getName(),
+                    event.getEventType().getLabel(), selectedGiftName,
+                    event.getManagerToken());
         });
 
         return "redirect:/gift/" + token + "/confirmed";

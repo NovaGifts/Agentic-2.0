@@ -180,11 +180,7 @@ public class AiRecommendationService {
             rec.setPolicyStatus("compliant");
         }
 
-        // Approval check — threshold null means approval is always required when enabled
-        boolean needsApproval = policy.isApprovalRequired() &&
-                (policy.getApprovalThreshold() == null ||
-                 budget.compareTo(policy.getApprovalThreshold()) > 0);
-        rec.setApprovalRequired(needsApproval);
+        rec.setApprovalRequired(true);
 
         // Policy engine flags replace AI flags — policy rules are authoritative
         if (!flags.isEmpty()) {

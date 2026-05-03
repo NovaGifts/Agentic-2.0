@@ -17,6 +17,7 @@ public class ApprovalService {
     private final GiftCatalogService           catalogService;
     private final CompanyRepository            companyRepo;
     private final EmailService                 emailService;
+    private final GiftPolicyRepository         policyRepo;
 
     @Value("${app.base-url:http://localhost:8080}")
     private String baseUrl;
@@ -26,13 +27,15 @@ public class ApprovalService {
                             EmployeeRepository employeeRepo,
                             GiftCatalogService catalogService,
                             CompanyRepository companyRepo,
-                            EmailService emailService) {
+                            EmailService emailService,
+                            GiftPolicyRepository policyRepo) {
         this.eventRepo      = eventRepo;
         this.recRepo        = recRepo;
         this.employeeRepo   = employeeRepo;
         this.catalogService = catalogService;
         this.companyRepo    = companyRepo;
         this.emailService   = emailService;
+        this.policyRepo     = policyRepo;
     }
 
     public List<ApprovalItem> getQueue(Long companyId) {
@@ -45,7 +48,8 @@ public class ApprovalService {
         List<ApprovalItem> queue = new ArrayList<>();
         for (UpcomingEvent event : events) {
             String status = event.getStatus();
-            if (!"SELECTION_PENDING".equals(status) && !"APPROVED".equals(status) && !"REJECTED".equals(status)) continue;
+            if (!"LINK_SENT".equals(status) && !"SELECTION_PENDING".equals(status)
+                    && !"APPROVED".equals(status) && !"REJECTED".equals(status)) continue;
 
             GiftRecommendation rec = recByEventId.get(event.getId());
             if (rec != null) {
@@ -59,6 +63,8 @@ public class ApprovalService {
                     item.setSelectedGiftName(catalogService.findById(rec.getSelectedGiftId())
                             .map(g -> (String) g.get("name")).orElse(null));
                 }
+                policyRepo.findByCompanyIdAndEventType(companyId, event.getEventType())
+                        .ifPresent(p -> item.setPolicyBudget(p.getBudgetLimit()));
                 queue.add(item);
             }
         }

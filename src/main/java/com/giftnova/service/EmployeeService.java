@@ -101,6 +101,7 @@ public class EmployeeService {
         emp.setEmail(email);
         emp.setDepartment(get(record, "department"));
         emp.setManager(get(record, "manager"));
+        emp.setManagerEmail(get(record, "manager_email"));
         emp.setCountry(get(record, "country"));
 
         // Date fields — must be yyyy-MM-dd format
@@ -133,6 +134,7 @@ public class EmployeeService {
         dest.setName(src.getName());
         dest.setDepartment(src.getDepartment());
         dest.setManager(src.getManager());
+        dest.setManagerEmail(src.getManagerEmail());
         dest.setCountry(src.getCountry());
         dest.setStartDate(src.getStartDate());
         dest.setBirthday(src.getBirthday());

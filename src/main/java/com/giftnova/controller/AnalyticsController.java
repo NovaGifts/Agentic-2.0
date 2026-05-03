@@ -26,6 +26,7 @@ public class AnalyticsController {
         Company company = companyService.findById(companyId);
         model.addAttribute("company", company);
         model.addAttribute("metrics", analyticsService.compute(companyId));
+        model.addAttribute("currentMonth", java.time.YearMonth.now().format(java.time.format.DateTimeFormatter.ofPattern("MMMM yyyy")));
         return "analytics/dashboard";
     }
 }

@@ -31,7 +31,7 @@ public class ApprovalController {
     public String queue(@PathVariable Long companyId, Model model) {
         List<ApprovalItem> queue = approvalService.getQueue(companyId);
 
-        long selectionCount = queue.stream().filter(i -> "SELECTION_PENDING".equals(i.getEvent().getStatus())).count();
+        long selectionCount = queue.stream().filter(i -> i.getRecommendation().getSelectedGiftId() == null).count();
         long approvedCount  = queue.stream().filter(i -> "APPROVED".equals(i.getEvent().getStatus())).count();
         long rejectedCount  = queue.stream().filter(i -> "REJECTED".equals(i.getEvent().getStatus())).count();
 

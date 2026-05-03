@@ -65,12 +65,6 @@ public class Company {
     @Column(name = "monthly_budget", nullable = false, precision = 12, scale = 2)
     private BigDecimal monthlyBudget;
 
-    // Gifts costing more than this need manager approval before being sent
-    @NotNull(message = "Approval threshold is required")
-    @DecimalMin(value = "0.01", message = "Threshold must be greater than 0")
-    @Column(name = "approval_threshold", nullable = false, precision = 10, scale = 2)
-    private BigDecimal approvalThreshold;
-
     // Comma-separated list of gift categories that are blocked (e.g. "Alcohol, Tobacco")
     @Column(name = "restricted_categories")
     private String restrictedCategories;
@@ -120,8 +114,6 @@ public class Company {
     public void setTimezone(String timezone) { this.timezone = timezone; }
     public BigDecimal getMonthlyBudget() { return monthlyBudget; }
     public void setMonthlyBudget(BigDecimal monthlyBudget) { this.monthlyBudget = monthlyBudget; }
-    public BigDecimal getApprovalThreshold() { return approvalThreshold; }
-    public void setApprovalThreshold(BigDecimal approvalThreshold) { this.approvalThreshold = approvalThreshold; }
     public LocalDateTime getCreatedAt() { return createdAt; }
     public String getRestrictedCategories() { return restrictedCategories; }
     public void setRestrictedCategories(String restrictedCategories) { this.restrictedCategories = restrictedCategories; }
