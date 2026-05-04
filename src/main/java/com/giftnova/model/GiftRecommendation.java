@@ -65,6 +65,9 @@ public class GiftRecommendation {
     @Column(name = "donation_chosen")
     private boolean donationChosen;
 
+    @Column(name = "surprise_chosen")
+    private boolean surpriseChosen;
+
     @Column(name = "recipient_rating")
     private Integer recipientRating;
 
@@ -101,6 +104,8 @@ public class GiftRecommendation {
     public void setThankYouNote(String thankYouNote) { this.thankYouNote = thankYouNote; }
     public boolean isDonationChosen() { return donationChosen; }
     public void setDonationChosen(boolean donationChosen) { this.donationChosen = donationChosen; }
+    public boolean isSurpriseChosen() { return surpriseChosen; }
+    public void setSurpriseChosen(boolean surpriseChosen) { this.surpriseChosen = surpriseChosen; }
     public Integer getRecipientRating() { return recipientRating; }
     public void setRecipientRating(Integer recipientRating) { this.recipientRating = recipientRating; }
     public LocalDateTime getCreatedAt() { return createdAt; }

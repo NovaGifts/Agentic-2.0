@@ -44,7 +44,8 @@ public class RecipientService {
     // Saves the employee's choice and moves the event into the HR review queue
     public void saveSelection(String token, String selectedGiftId,
                                String shippingAddress, String thankYouNote,
-                               boolean donationChosen, Integer recipientRating) {
+                               boolean donationChosen, boolean surpriseChosen,
+                               Integer recipientRating) {
         eventRepo.findByRecipientToken(token).ifPresent(event -> {
             event.setStatus("SELECTION_PENDING");
             eventRepo.save(event);
@@ -54,6 +55,7 @@ public class RecipientService {
                 rec.setShippingAddress(shippingAddress);
                 rec.setThankYouNote(thankYouNote);
                 rec.setDonationChosen(donationChosen);
+                rec.setSurpriseChosen(surpriseChosen);
                 rec.setRecipientRating(recipientRating);
                 recRepo.save(rec);
             });
@@ -63,6 +65,7 @@ public class RecipientService {
     public String getSelectedGiftName(GiftRecommendation rec) {
         if (rec == null) return "Your gift";
         if (rec.isDonationChosen()) return "Charitable donation";
+        if (rec.isSurpriseChosen()) return "Surprise Me!";
         if (rec.getSelectedGiftId() != null) {
             return catalogService.findById(rec.getSelectedGiftId())
                     .map(g -> (String) g.get("name")).orElse("Selected gift");
